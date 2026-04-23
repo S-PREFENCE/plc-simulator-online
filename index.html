@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="screen-orientation" content="portrait">
+<meta name="x5-orientation" content="portrait">
+<title>PLC仿真器 - 梯形图编程</title>
+<style>
+:root {
+  --primary:#2563eb;--primary-light:#3b82f6;--primary-dark:#1d4ed8;--primary-bg:#eff6ff;
+  --success:#10b981;--success-light:#d1fae5;--success-glow:rgba(16,185,129,0.35);
+  --warning:#f59e0b;--warning-bg:#fffbeb;
+  --danger:#ef4444;--danger-bg:#fef2f2;
+  --info:#06b6d4;--info-bg:#ecfeff;
+  --bg:#f1f5f9;--surface:#fff;--surface-hover:#f8fafc;
+  --border:#e2e8f0;--border-light:#f1f5f9;
+  --text:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.06);--shadow-lg:0 8px 30px rgba(0,0,0,0.1);
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,'PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  --font-mono:'SF Mono','Fira Code','Consolas','PingFang SC',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;position:fixed;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-user-select:none;user-select:none;font-size:14px;line-height:1.4}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;background:none}
+input,select,textarea{font-family:inherit;outline:none}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;background:var(--bg)}
+
+/* Header */
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;flex-shrink:0;z-index:100;box-shadow:0 2px 12px rgba(37,99,235,0.3);position:relative;overflow:hidden}
+.app-header::after{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.08) 0%,transparent 70%);border-radius:50%}
+.header-left{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.header-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,0.2)}
+.header-title{font-size:17px;font-weight:700;letter-spacing:0.5px}
+.header-badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.2);backdrop-filter:blur(10px);letter-spacing:0.5px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.run-indicator{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);transition:all 0.3s ease}
+.run-indicator.active{background:var(--success);box-shadow:0 0 16px var(--success-glow)}
+.run-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.5);transition:all 0.3s}
+.run-indicator.active .run-dot{background:#fff;animation:glow-pulse 1.5s ease infinite}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.4)}50%{box-shadow:0 0 0 4px rgba(255,255,255,0)}}
+.header-icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.12);backdrop-filter:blur(10px);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.15)}
+.header-icon-btn:active{transform:scale(0.92);background:rgba(255,255,255,0.2)}
+
+/* Tabs */
+.nav-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;position:relative;box-shadow:var(--shadow-sm)}
+.nav-tab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:500;color:var(--text-muted);background:none;transition:all 0.25s;position:relative}
+.nav-tab .tab-icon{font-size:16px;transition:all 0.25s}
+.nav-tab.active{color:var(--primary);font-weight:600}
+.nav-tab.active .tab-icon{transform:scale(1.1)}
+.nav-tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:2.5px;background:var(--primary);border-radius:2px;transition:all 0.3s ease;transform:translateX(-50%)}
+.nav-tab.active::after{width:60%}
+
+/* Main */
+.main-content{flex:1;overflow:hidden;position:relative;background:var(--bg)}
+.tab-page{position:absolute;inset:0;display:none;flex-direction:column}
+.tab-page.active{display:flex}
+
+/* Program Page */
+.program-page{flex-direction:column}
+.ladder-toolbar{display:flex;align-items:center;gap:5px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border-light);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.ladder-toolbar::-webkit-scrollbar{display:none}
+.tb-btn{height:32px;padding:0 12px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;color:var(--text-secondary);background:var(--bg);white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all 0.15s;border:1px solid transparent}
+.tb-btn:hover,.tb-btn:active{background:var(--primary-bg);color:var(--primary);border-color:var(--primary-bg)}
+.tb-btn.accent{background:var(--primary-bg);color:var(--primary)}
+.tb-btn.danger{color:var(--danger)}
+.tb-btn.danger:active{background:var(--danger-bg)}
+.tb-sep{width:1px;height:22px;background:var(--border);margin:0 3px;flex-shrink:0}
+
+.ladder-canvas-wrap{flex:1;overflow:auto;background:var(--surface);position:relative;background-image:radial-gradient(circle at 1px 1px,#e8ecf1 1px,transparent 0);background-size:20px 20px}
+.ladder-canvas-wrap canvas{display:block;min-width:100%;min-height:100%}
+
+/* Element Bar */
+.element-bar{display:flex;gap:4px;padding:8px 10px 10px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.element-bar::-webkit-scrollbar{display:none}
+.el-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 9px;border-radius:var(--radius-md);background:var(--bg);min-width:52px;transition:all 0.15s;border:1px solid transparent;position:relative}
+.el-btn:active{transform:scale(0.93);background:var(--primary-bg);border-color:var(--primary-bg)}
+.el-btn .el-icon{font-size:17px;color:var(--primary);font-weight:600}
+.el-btn .el-name{font-size:9px;color:var(--text-muted);font-weight:500}
+.el-btn.danger .el-icon{color:var(--danger)}
+.el-btn .el-badge{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:var(--danger);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+
+/* IO Page */
+.io-page{padding:12px;overflow-y:auto}
+.io-section{margin-bottom:14px;background:var(--surface);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);transition:all 0.2s}
+.io-section:active{transform:scale(0.995)}
+.io-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.io-section-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.io-section-title .icon{font-size:16px}
+.io-section-title .icon.x{color:var(--info)}
+.io-section-title .icon.y{color:var(--success)}
+.io-section-title .icon.t{color:var(--warning)}
+.io-section-title .icon.c{color:var(--danger)}
+.io-section-title .icon.d{color:var(--primary)}
+.io-section-sub{font-size:11px;color:var(--text-muted);font-weight:500}
+.io-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+
+/* IO Input Button */
+.io-input-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;border-radius:var(--radius-md);background:var(--bg);border:2px solid var(--border);transition:all 0.2s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.io-input-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--info);opacity:0;transition:opacity 0.2s;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.io-input-btn .io-label{font-size:12px;font-weight:700;color:var(--text-secondary);transition:all 0.2s}
+.io-input-btn .io-status{font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px}
+.io-input-btn:active{transform:scale(0.93)}
+.io-input-btn.on{background:var(--info-bg);border-color:var(--info);box-shadow:0 0 12px rgba(6,182,212,0.2)}
+.io-input-btn.on::before{opacity:1}
+.io-input-btn.on .io-label{color:var(--info)}
+.io-input-btn.on .io-status{color:var(--info);font-weight:700}
+
+/* Output LED */
+.io-output-led{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;border-radius:var(--radius-md);background:var(--bg);border:2px solid var(--border);transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative}
+.io-output-led::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--success);opacity:0;transition:opacity 0.3s;border-radius:var(--radius-md) var(--radius-md) 0 0}
+.led-circle{width:28px;height:28px;border-radius:50%;background:#d1d5db;border:3px solid #c1c5cb;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative}
+.led-circle::after{content:'';position:absolute;top:4px;left:6px;width:8px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);opacity:0.6}
+.io-output-led.on{background:var(--success-light);border-color:var(--success);box-shadow:0 0 16px var(--success-glow)}
+.io-output-led.on::before{opacity:1}
+.io-output-led.on .led-circle{background:var(--success);border-color:#059669;box-shadow:0 0 12px var(--success-glow),inset 0 -2px 4px rgba(0,0,0,0.1)}
+.io-output-led.on .led-circle::after{opacity:1;background:rgba(255,255,255,0.7)}
+.io-output-led .io-label{font-size:12px;font-weight:700;color:var(--text-secondary);transition:all 0.3s}
+.io-output-led.on .io-label{color:var(--success)}
+
+/* Device Card (Timer/Counter/Data) */
+.device-card{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:6px;background:var(--bg);border-radius:var(--radius-md);border-left:3px solid var(--border);transition:all 0.2s}
+.device-card.active{border-left-color:var(--primary);background:var(--primary-bg);box-shadow:0 0 8px rgba(37,99,235,0.08)}
+.device-card .device-info{display:flex;align-items:center;gap:8px}
+.device-card .device-icon{width:28px;height:28px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-muted);box-shadow:var(--shadow-sm)}
+.device-card.active .device-icon{background:var(--primary);color:#fff}
+.device-card .device-name{font-size:13px;font-weight:700;color:var(--text)}
+.device-card .device-values{display:flex;align-items:center;gap:8px}
+.device-card .device-cv{font-size:16px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
+.device-card .device-pv{font-size:11px;color:var(--text-muted);font-weight:500}
+.device-card .device-badge{font-size:10px;padding:3px 10px;border-radius:20px;background:var(--surface);color:var(--text-muted);font-weight:600;box-shadow:var(--shadow-sm)}
+.device-card.active .device-badge{background:var(--primary);color:#fff}
+
+/* Data Register Card */
+.data-card{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;margin-bottom:5px;background:var(--bg);border-radius:var(--radius-md);border-left:3px solid var(--border);transition:all 0.2s}
+.data-card:hover{background:var(--surface-hover)}
+.data-card .data-info{display:flex;align-items:center;gap:8px}
+.data-card .data-icon{width:26px;height:26px;border-radius:6px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);box-shadow:var(--shadow-sm)}
+.data-card .data-name{font-size:12px;font-weight:600;color:var(--text)}
+.data-card .data-type{font-size:9px;color:var(--text-muted);background:var(--surface);padding:1px 6px;border-radius:4px;margin-left:4px}
+.data-card .data-value{font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;min-width:60px;text-align:right}
+.data-card .data-value.negative{color:var(--danger)}
+.data-card .data-value.float{color:var(--info)}
+
+/* Project Page */
+.project-page{padding:12px;overflow-y:auto}
+.project-section{margin-bottom:16px}
+.project-section-title{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-left:4px}
+.project-card{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);border:1px solid var(--border-light);transition:all 0.2s}
+.project-card:active{background:var(--bg);transform:scale(0.98)}
+.project-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:var(--shadow-sm)}
+.project-icon.blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe)}
+.project-icon.green{background:linear-gradient(135deg,#d1fae5,#a7f3d0)}
+.project-icon.orange{background:linear-gradient(135deg,#fef3c7,#fde68a)}
+.project-icon.purple{background:linear-gradient(135deg,#f3e8ff,#e9d5ff)}
+.project-icon.red{background:linear-gradient(135deg,#fee2e2,#fecaca)}
+.project-info{flex:1}
+.project-name{font-size:14px;font-weight:700;color:var(--text)}
+.project-desc{font-size:11px;color:var(--text-muted);margin-top:3px;font-weight:500}
+.project-action{font-size:12px;color:var(--primary);padding:5px 14px;border-radius:var(--radius-sm);background:var(--primary-bg);font-weight:600;transition:all 0.15s}
+.project-action:active{background:var(--primary);color:#fff}
+
+/* Settings Page */
+.settings-page{padding:12px;overflow-y:auto}
+.setting-group{background:var(--surface);border-radius:var(--radius-lg);margin-bottom:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);overflow:hidden}
+.setting-group-title{padding:10px 16px;font-size:11px;font-weight:700;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border-light);letter-spacing:0.5px;text-transform:uppercase}
+.setting-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border-light);transition:all 0.15s}
+.setting-item:last-child{border-bottom:none}
+.setting-item:active{background:var(--bg)}
+.setting-label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);font-weight:500}
+.setting-label .icon{font-size:16px}
+.setting-value{font-size:13px;color:var(--text-muted);font-weight:600}
+.setting-value.highlight{color:var(--primary)}
+
+/* Sim Control */
+.sim-control{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,0.04)}
+.sim-btn{height:40px;border-radius:var(--radius-md);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 16px;transition:all 0.15s;white-space:nowrap}
+.sim-btn:active{transform:scale(0.95)}
+.sim-btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;flex:1;box-shadow:0 2px 8px rgba(37,99,235,0.3)}
+.sim-btn.primary:active{box-shadow:0 1px 4px rgba(37,99,235,0.2)}
+.sim-btn.primary.running{background:linear-gradient(135deg,var(--danger),#dc2626);box-shadow:0 2px 8px rgba(239,68,68,0.3)}
+.sim-btn.secondary{background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)}
+.sim-btn.secondary:active{background:var(--border-light)}
+.sim-speed{display:flex;align-items:center;gap:3px;margin-left:auto}
+.sim-speed label{font-size:11px;color:var(--text-muted);font-weight:600;margin-right:4px}
+.speed-chip{height:30px;padding:0 12px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);transition:all 0.15s}
+.speed-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 2px 6px rgba(37,99,235,0.25)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:1000;opacity:0;transition:opacity 0.25s}
+.modal-overlay.show{display:flex;opacity:1}
+.modal-sheet{width:100%;max-width:480px;background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:0 0 env(safe-area-inset-bottom,0);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg)}
+.modal-overlay.show .modal-sheet{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:10px auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border-light)}
+.modal-title{font-size:16px;font-weight:700;color:var(--text)}
+.modal-close{width:30px;height:30px;border-radius:50%;background:var(--bg);font-size:16px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.modal-close:active{background:var(--border)}
+.modal-body{padding:18px}
+.modal-footer{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--border-light)}
+.modal-footer .btn{flex:1;height:42px;border-radius:var(--radius-md);font-size:14px;font-weight:600;transition:all 0.15s}
+.modal-footer .btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+.btn-primary:active{background:var(--primary-dark)}
+.btn-default{background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)}
+.btn-danger{background:var(--danger);color:#fff}
+
+/* Form */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.form-input{width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);transition:all 0.2s}
+.form-input:focus{border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-select{width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;color:var(--text);background:var(--bg);transition:all 0.2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-select:focus{border-color:var(--primary);background-color:var(--surface);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--text);color:#fff;padding:10px 20px;border-radius:var(--radius-lg);font-size:13px;font-weight:500;z-index:2000;opacity:0;transition:all 0.3s;pointer-events:none;box-shadow:var(--shadow-lg);white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeIn 0.3s ease}
+
+/* Landscape */
+@media (orientation:landscape) and (max-height:500px){
+  .app-header{height:40px;padding:0 10px}
+  .header-title{font-size:14px}
+  .nav-tabs{display:none}
+  .tab-page.active{display:flex}
+  .program-page{flex-direction:column}
+  .sim-control{padding:6px 8px}
+  .sim-btn{height:32px;font-size:11px;padding:0 10px}
+  .element-bar{padding:4px 6px}
+  .el-btn{padding:4px 6px;min-width:44px}
+  .el-btn .el-icon{font-size:14px}
+  .el-btn .el-name{font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-logo">⚡</div>
+      <span class="header-title">PLC 仿真器</span>
+      <span class="header-badge">离线版</span>
+    </div>
+    <div class="header-right">
+      <div class="run-indicator" id="runStatus">
+        <span class="run-dot"></span>
+        <span>已停止</span>
+      </div>
+      <button class="header-icon-btn" onclick="showExportModal()" title="导出">📤</button>
+      <button class="header-icon-btn" onclick="showImportModal()" title="导入">📥</button>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('program',this)">
+      <span class="tab-icon">📐</span><span>梯形图</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('io',this)">
+      <span class="tab-icon">📊</span><span>IO监控</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('data',this)">
+      <span class="tab-icon">💾</span><span>数据区</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('project',this)">
+      <span class="tab-icon">📁</span><span>工程</span>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Tab 1: 梯形图编程 -->
+    <div class="tab-page active program-page" id="tab-program">
+      <div class="ladder-toolbar">
+        <button class="tb-btn accent" onclick="addNewRung()">＋ 梯级</button>
+        <button class="tb-btn" onclick="deleteRung()">－ 梯级</button>
+        <span class="tb-sep"></span>
+        <button class="tb-btn" onclick="insertElement('contact-no')">常开 ┤├</button>
+        <button class="tb-btn" onclick="insertElement('contact-nc')">常闭 ┤╯</button>
+        <button class="tb-btn" onclick="insertElement('coil')">线圈 ─( )</button>
+        <button class="tb-btn" onclick="insertElement('timer')">定时器 ─[T]</button>
+        <button class="tb-btn" onclick="insertElement('counter')">计数器 ─[C]</button>
+        <button class="tb-btn" onclick="insertElement('mov')">传送 ─[MOV]</button>
+        <span class="tb-sep"></span>
+        <button class="tb-btn" onclick="loadExample('traffic')">🚦交通灯</button>
+        <button class="tb-btn" onclick="loadExample('motor')">⚙️电机</button>
+        <button class="tb-btn" onclick="loadExample('mov_demo')">📦MOV传送</button>
+      </div>
+      <div class="ladder-canvas-wrap" id="canvasWrap">
+        <canvas id="ladderCanvas"></canvas>
+      </div>
+      <div class="element-bar">
+        <button class="el-btn" onclick="insertElement('contact-no')"><span class="el-icon">┤ ├</span><span class="el-name">常开</span></button>
+        <button class="el-btn" onclick="insertElement('contact-nc')"><span class="el-icon">┤ ╯</span><span class="el-name">常闭</span></button>
+        <button class="el-btn" onclick="insertElement('coil')"><span class="el-icon">( )</span><span class="el-name">线圈</span></button>
+        <button class="el-btn" onclick="insertElement('timer')"><span class="el-icon">[T]</span><span class="el-name">定时器</span></button>
+        <button class="el-btn" onclick="insertElement('counter')"><span class="el-icon">[C]</span><span class="el-name">计数器</span></button>
+        <button class="el-btn" onclick="insertElement('set')"><span class="el-icon">[S]</span><span class="el-name">置位</span></button>
+        <button class="el-btn" onclick="insertElement('reset')"><span class="el-icon">[R]</span><span class="el-name">复位</span></button>
+        <button class="el-btn" onclick="insertElement('mov')"><span class="el-icon">[MOV]</span><span class="el-name">传送</span></button>
+        <button class="el-btn danger" onclick="clearAll()"><span class="el-icon">🗑</span><span class="el-name">清空</span></button>
+      </div>
+    </div>
+
+    <!-- Tab 2: IO监控 -->
+    <div class="tab-page io-page" id="tab-io">
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon x">📥</span> 输入信号 X0~X7</span>
+          <span class="io-section-sub">点击切换</span>
+        </div>
+        <div class="io-grid" id="inputGrid"></div>
+      </div>
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon y">📤</span> 输出信号 Y0~Y7</span>
+          <span class="io-section-sub">自动刷新</span>
+        </div>
+        <div class="io-grid" id="outputGrid"></div>
+      </div>
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon t">⏱</span> 定时器 T0~T7</span>
+        </div>
+        <div id="timerList"></div>
+      </div>
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon c">🔢</span> 计数器 C0~C7</span>
+        </div>
+        <div id="counterList"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: 数据区 -->
+    <div class="tab-page io-page" id="tab-data">
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon d">💾</span> 数据寄存器 D0~D15</span>
+          <span class="io-section-sub">INT 类型 (-32768~32767)</span>
+        </div>
+        <div id="dataIntList"></div>
+      </div>
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon d">💾</span> 双字寄存器 DD0~DD7</span>
+          <span class="io-section-sub">DINT 类型 (-2147483648~2147483647)</span>
+        </div>
+        <div id="dataDintList"></div>
+      </div>
+      <div class="io-section">
+        <div class="io-section-header">
+          <span class="io-section-title"><span class="icon d">🔧</span> 中间继电器 M0~M15</span>
+          <span class="io-section-sub">位状态</span>
+        </div>
+        <div class="io-grid" id="relayGrid"></div>
+      </div>
+    </div>
+
+    <!-- Tab 4: 工程 -->
+    <div class="tab-page project-page" id="tab-project">
+      <div class="project-section">
+        <div class="project-section-title">示例程序</div>
+        <div class="project-card" onclick="loadExample('traffic')">
+          <div class="project-icon blue">🚦</div>
+          <div class="project-info">
+            <div class="project-name">交通灯控制</div>
+            <div class="project-desc">经典十字路口交通灯 · 定时器级联</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+        <div class="project-card" onclick="loadExample('motor')">
+          <div class="project-icon green">⚙️</div>
+          <div class="project-info">
+            <div class="project-name">电机启保停</div>
+            <div class="project-desc">启动-保持-停止电路 · 自锁回路</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+        <div class="project-card" onclick="loadExample('flash')">
+          <div class="project-icon orange">💡</div>
+          <div class="project-info">
+            <div class="project-name">流水灯</div>
+            <div class="project-desc">4盏LED依次点亮 · 定时器链</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+        <div class="project-card" onclick="loadExample('counter')">
+          <div class="project-icon purple">🔢</div>
+          <div class="project-info">
+            <div class="project-name">产品计数</div>
+            <div class="project-desc">计数器应用 · 达到设定值触发</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+        <div class="project-card" onclick="loadExample('alarm')">
+          <div class="project-icon red">🚨</div>
+          <div class="project-info">
+            <div class="project-name">报警系统</div>
+            <div class="project-desc">多条件报警 · 定时延时</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+        <div class="project-card" onclick="loadExample('mov_demo')">
+          <div class="project-icon blue">📦</div>
+          <div class="project-info">
+            <div class="project-name">MOV 数据传送</div>
+            <div class="project-desc">INT/DINT 数据传送演示 · 数据运算</div>
+          </div>
+          <button class="project-action">加载</button>
+        </div>
+      </div>
+      <div class="project-section">
+        <div class="project-section-title">数据管理</div>
+        <div class="project-card" onclick="saveToLocal()">
+          <div class="project-icon green" style="font-size:18px">💾</div>
+          <div class="project-info">
+            <div class="project-name">保存到本地</div>
+            <div class="project-desc">自动保存当前工程到浏览器</div>
+          </div>
+          <button class="project-action">保存</button>
+        </div>
+        <div class="project-card" onclick="showExportModal()">
+          <div class="project-icon blue" style="font-size:18px">📤</div>
+          <div class="project-info">
+            <div class="project-name">导出工程</div>
+            <div class="project-desc">生成 .plc 文件，可分享给他人</div>
+          </div>
+          <button class="project-action">导出</button>
+        </div>
+        <div class="project-card" onclick="showImportModal()">
+          <div class="project-icon orange" style="font-size:18px">📥</div>
+          <div class="project-info">
+            <div class="project-name">导入工程</div>
+            <div class="project-desc">加载他人分享的 .plc 文件</div>
+          </div>
+          <button class="project-action">导入</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sim Control -->
+  <div class="sim-control">
+    <button class="sim-btn primary" id="runBtn" onclick="toggleRun()">▶ 运行</button>
+    <button class="sim-btn secondary" onclick="stepRun()">⏭ 单步</button>
+    <button class="sim-btn secondary" onclick="resetAll()">🔄 复位</button>
+    <div class="sim-speed">
+      <label>速度</label>
+      <button class="speed-chip active" onclick="setSpeed(1,this)">1x</button>
+      <button class="speed-chip" onclick="setSpeed(5,this)">5x</button>
+      <button class="speed-chip" onclick="setSpeed(10,this)">10x</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="editModalTitle">编辑元件</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">元件类型</label>
+        <div id="editTypeDisplay" style="padding:10px 14px;background:var(--bg);border-radius:var(--radius-md);color:var(--text);font-weight:700;font-size:14px;border:1px solid var(--border)"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">地址</label>
+        <input class="form-input" id="editAddress" type="text" placeholder="如 X0, Y1, T0, M10, D0">
+      </div>
+      <div class="form-group" id="editPresetGroup" style="display:none">
+        <label class="form-label">预设值</label>
+        <input class="form-input" id="editPreset" type="number" value="100" placeholder="预设值">
+      </div>
+      <!-- MOV specific -->
+      <div id="movFields" style="display:none">
+        <div class="form-group">
+          <label class="form-label">源数据 (Source)</label>
+          <input class="form-input" id="editMovSource" type="text" placeholder="如 D0, K100, DD0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">目标地址 (Destination)</label>
+          <input class="form-input" id="editMovDest" type="text" placeholder="如 D1, Y0, DD1">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="deleteEditingElement()">删除</button>
+      <button class="btn btn-default" onclick="closeEditModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmEdit()">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== PLC State ====================
+const plc = {
+  inputs: new Array(8).fill(false),
+  outputs: new Array(8).fill(false),
+  relays: new Array(32).fill(false),
+  // INT registers: D0-D15, range -32768 ~ 32767
+  dataInt: Array.from({length:16}, () => ({value:0, type:'INT'})),
+  // DINT registers: DD0-DD7, range -2147483648 ~ 2147483647
+  dataDint: Array.from({length:8}, () => ({value:0, type:'DINT'})),
+  timers: Array.from({length:8}, () => ({current:0, preset:100, enabled:false, done:false})),
+  counters: Array.from({length:8}, () => ({current:0, preset:10, enabled:false, done:false, _prevPower:false})),
+  isRunning: false,
+  speed: 1,
+  scanCount: 0,
+  rungs: [],
+  selectedRung: -1,
+  selectedElement: null,
+  scanTimer: null
+};
+
+// ==================== Tab Switch ====================
+function switchTab(name, btn) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'program') setTimeout(resizeCanvas, 50);
+  if (name === 'io') updateIODisplay();
+  if (name === 'data') updateDataDisplay();
+}
+
+// ==================== Toast ====================
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==================== Ladder Data ====================
+function addNewRung() {
+  plc.rungs.push({ elements: [] });
+  plc.selectedRung = plc.rungs.length - 1;
+  resizeCanvas();
+  drawLadder();
+  showToast('已添加梯级 ' + plc.rungs.length);
+}
+
+function deleteRung() {
+  if (plc.selectedRung >= 0 && plc.selectedRung < plc.rungs.length) {
+    plc.rungs.splice(plc.selectedRung, 1);
+    if (plc.selectedRung >= plc.rungs.length) plc.selectedRung = plc.rungs.length - 1;
+    resizeCanvas();
+    drawLadder();
+    showToast('已删除梯级');
+  }
+}
+
+function insertElement(type) {
+  if (plc.rungs.length === 0) addNewRung();
+  const rung = plc.rungs[plc.rungs.length - 1];
+  rung.elements.push({
+    id: 'el_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+    type: type,
+    address: '',
+    preset: 100,
+    // MOV specific
+    movSource: '',
+    movDest: ''
+  });
+  drawLadder();
+}
+
+function clearAll() {
+  plc.rungs = [];
+  plc.selectedRung = -1;
+  resizeCanvas();
+  drawLadder();
+  showToast('已清空梯形图');
+}
+
+// ==================== Canvas ====================
+const canvas = document.getElementById('ladderCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const wrap = document.getElementById('canvasWrap');
+  if (!wrap) return;
+  const dpr = window.devicePixelRatio || 1;
+  const h = Math.max(wrap.clientHeight, plc.rungs.length * 80 + 120);
+  canvas.width = wrap.clientWidth * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = wrap.clientWidth + 'px';
+  canvas.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawLadder();
+}
+
+function drawLadder() {
+  const W = canvas.width / (window.devicePixelRatio || 1);
+  const H = canvas.height / (window.devicePixelRatio || 1);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid dots
+  ctx.fillStyle = '#e2e8f0';
+  for (let x = 0; x < W; x += 20) {
+    for (let y = 0; y < H; y += 20) {
+      ctx.beginPath();
+      ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  if (plc.rungs.length === 0) {
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 15px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center';
+    ctx.fillText('点击 "+ 梯级" 或选择示例开始编程', W/2, H/2 - 10);
+    ctx.font = '400 12px ' + getComputedStyle(document.body).fontFamily;
+    ctx.fillText('支持常开/常闭触点、线圈、定时器、计数器、MOV传送', W/2, H/2 + 14);
+    return;
+  }
+
+  const leftBus = 55;
+  const rightBus = W - 35;
+  const rungH = 80;
+  const startY = 35;
+
+  // Left bus
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(leftBus, startY);
+  ctx.lineTo(leftBus, startY + plc.rungs.length * rungH);
+  ctx.stroke();
+
+  // Right bus
+  ctx.beginPath();
+  ctx.moveTo(rightBus, startY);
+  ctx.lineTo(rightBus, startY + plc.rungs.length * rungH);
+  ctx.stroke();
+
+  // Rungs
+  plc.rungs.forEach((rung, ri) => {
+    const y = startY + ri * rungH + rungH / 2;
+
+    // Rung number
+    ctx.fillStyle = plc.selectedRung === ri ? '#2563eb' : '#94a3b8';
+    ctx.font = '600 11px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'right';
+    ctx.fillText('N' + (ri + 1), leftBus - 12, y + 4);
+
+    // Selected background
+    if (plc.selectedRung === ri) {
+      ctx.fillStyle = 'rgba(37,99,235,0.04)';
+      ctx.fillRect(leftBus + 2, startY + ri * rungH + 2, rightBus - leftBus - 4, rungH - 4);
+      ctx.strokeStyle = 'rgba(37,99,235,0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(leftBus + 2, startY + ri * rungH + 2, rightBus - leftBus - 4, rungH - 4);
+      ctx.setLineDash([]);
+    }
+
+    // Connect left bus
+    if (rung.elements.length > 0) {
+      const elState = getElementEnergized(rung.elements[0]);
+      ctx.strokeStyle = elState ? '#10b981' : '#334155';
+      ctx.lineWidth = elState ? 2.5 : 2;
+      ctx.beginPath();
+      ctx.moveTo(leftBus, y);
+      ctx.lineTo(leftBus + 18, y);
+      ctx.stroke();
+    }
+
+    // Elements
+    const elGap = Math.min(90, (rightBus - leftBus - 70) / Math.max(rung.elements.length, 1));
+    let curX = leftBus + 18;
+
+    rung.elements.forEach((el, ei) => {
+      const energized = getElementEnergized(el);
+      drawElement(el, curX, y, energized, elGap);
+
+      // Connection to next
+      const nextX = curX + elGap;
+      ctx.strokeStyle = energized ? '#10b981' : '#334155';
+      ctx.lineWidth = energized ? 2.5 : 2;
+      ctx.beginPath();
+      ctx.moveTo(curX + elGap - 12, y);
+      ctx.lineTo(nextX + 6, y);
+      ctx.stroke();
+
+      curX = nextX;
+    });
+
+    // Connect last to right bus
+    if (rung.elements.length > 0) {
+      const lastEl = rung.elements[rung.elements.length - 1];
+      const lastEnergized = getElementEnergized(lastEl);
+      ctx.strokeStyle = lastEnergized ? '#10b981' : '#334155';
+      ctx.lineWidth = lastEnergized ? 2.5 : 2;
+      ctx.beginPath();
+      ctx.moveTo(curX + 6, y);
+      ctx.lineTo(rightBus, y);
+      ctx.stroke();
+    }
+  });
+}
+
+function drawElement(el, x, y, energized, gap) {
+  const color = energized ? '#10b981' : '#334155';
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const w = gap - 24;
+  const h = 22;
+
+  switch (el.type) {
+    case 'contact-no':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w*0.18, y);
+      ctx.moveTo(x + w*0.18, y - h*0.65);
+      ctx.lineTo(x + w*0.18, y + h*0.65);
+      ctx.moveTo(x + w*0.82, y - h*0.65);
+      ctx.lineTo(x + w*0.82, y + h*0.65);
+      ctx.moveTo(x + w*0.82, y);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+      break;
+
+    case 'contact-nc':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w*0.18, y);
+      ctx.moveTo(x + w*0.18, y - h*0.65);
+      ctx.lineTo(x + w*0.18, y + h*0.65);
+      ctx.moveTo(x + w*0.82, y - h*0.65);
+      ctx.lineTo(x + w*0.82, y + h*0.65);
+      ctx.moveTo(x + w*0.32, y - h*0.75);
+      ctx.lineTo(x + w*0.68, y + h*0.75);
+      ctx.moveTo(x + w*0.82, y);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+      break;
+
+    case 'coil':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w*0.22, y);
+      ctx.arc(x + w*0.5, y, h*0.42, 0, Math.PI * 2);
+      ctx.moveTo(x + w*0.78, y);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+      if (energized) {
+        ctx.fillStyle = 'rgba(16,185,129,0.1)';
+        ctx.fill();
+      }
+      break;
+
+    case 'timer':
+    case 'counter':
+    case 'set':
+    case 'reset':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w*0.12, y);
+      ctx.rect(x + w*0.12, y - h*0.6, w*0.76, h*1.2);
+      ctx.moveTo(x + w*0.88, y);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+      if (energized) {
+        ctx.fillStyle = 'rgba(37,99,235,0.06)';
+        ctx.fillRect(x + w*0.12, y - h*0.6, w*0.76, h*1.2);
+      }
+      ctx.fillStyle = color;
+      ctx.font = 'bold 11px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'center';
+      const label = el.address || (el.type === 'timer' ? 'T?' : el.type === 'counter' ? 'C?' : el.type === 'set' ? 'S?' : 'R?');
+      ctx.fillText(label, x + w*0.5, y + 4);
+      break;
+
+    case 'mov':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w*0.08, y);
+      ctx.rect(x + w*0.08, y - h*0.65, w*0.84, h*1.3);
+      ctx.moveTo(x + w*0.92, y);
+      ctx.lineTo(x + w, y);
+      ctx.stroke();
+      if (energized) {
+        ctx.fillStyle = 'rgba(245,158,11,0.08)';
+        ctx.fillRect(x + w*0.08, y - h*0.65, w*0.84, h*1.3);
+      }
+      ctx.fillStyle = color;
+      ctx.font = 'bold 9px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'center';
+      ctx.fillText('MOV', x + w*0.5, y - 2);
+      ctx.font = '9px ' + getComputedStyle(document.body).fontFamily;
+      const src = el.movSource || '?';
+      const dst = el.movDest || '?';
+      ctx.fillText(src + '→' + dst, x + w*0.5, y + 10);
+      break;
+  }
+
+  // Address label
+  if (el.address && el.type !== 'timer' && el.type !== 'counter' && el.type !== 'mov') {
+    ctx.fillStyle = energized ? '#059669' : '#64748b';
+    ctx.font = '500 10px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center';
+    ctx.fillText(el.address, x + w/2, y - h*0.8 - 5);
+  }
+}
+
+function getElementEnergized(el) {
+  if (!el.address && el.type !== 'mov') return false;
+  if (el.type === 'mov') {
+    // MOV is energized when its input condition is true
+    return false; // Will be computed during scan
+  }
+  const m = el.address.match(/([XYMTC])(\d+)/);
+  if (!m) return false;
+  const t = m[1], idx = parseInt(m[2]);
+  switch(t) {
+    case 'X': return plc.inputs[idx] || false;
+    case 'Y': return plc.outputs[idx] || false;
+    case 'M': return plc.relays[idx] || false;
+    case 'T': return plc.timers[idx]?.done || false;
+    case 'C': return plc.counters[idx]?.done || false;
+    default: return false;
+  }
+}
+
+// ==================== Canvas Interaction ====================
+canvas.addEventListener('click', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const rungH = 80;
+  const startY = 35;
+
+  const ri = Math.floor((my - startY) / rungH);
+  if (ri >= 0 && ri < plc.rungs.length) {
+    plc.selectedRung = ri;
+
+    const y = startY + ri * rungH + rungH / 2;
+    const leftBus = 55;
+    const rightBus = rect.width - 35;
+    const elGap = Math.min(90, (rightBus - leftBus - 70) / Math.max(plc.rungs[ri].elements.length, 1));
+    let curX = leftBus + 18;
+
+    for (let ei = 0; ei < plc.rungs[ri].elements.length; ei++) {
+      const elW = elGap - 24;
+      if (mx >= curX - 8 && mx <= curX + elW + 18 && my >= y - 22 && my <= y + 22) {
+        openEditModal(ri, ei);
+        break;
+      }
+      curX += elGap;
+    }
+
+    drawLadder();
+  }
+});
+
+// ==================== Edit Modal ====================
+function openEditModal(rungIdx, elIdx) {
+  const el = plc.rungs[rungIdx].elements[elIdx];
+  plc.selectedElement = { rungIdx, elIdx };
+
+  const typeNames = {
+    'contact-no': '常开触点',
+    'contact-nc': '常闭触点',
+    'coil': '线圈',
+    'timer': '定时器',
+    'counter': '计数器',
+    'set': '置位',
+    'reset': '复位',
+    'mov': 'MOV 传送'
+  };
+
+  document.getElementById('editModalTitle').textContent = '编辑元件';
+  document.getElementById('editTypeDisplay').textContent = typeNames[el.type] || el.type;
+  document.getElementById('editAddress').value = el.address || '';
+  document.getElementById('editPreset').value = el.preset || 100;
+
+  const isTimerCounter = (el.type === 'timer' || el.type === 'counter');
+  document.getElementById('editPresetGroup').style.display = isTimerCounter ? 'block' : 'none';
+
+  const isMov = (el.type === 'mov');
+  document.getElementById('movFields').style.display = isMov ? 'block' : 'none';
+  if (isMov) {
+    document.getElementById('editMovSource').value = el.movSource || '';
+    document.getElementById('editMovDest').value = el.movDest || '';
+  }
+
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('show');
+  plc.selectedElement = null;
+}
+
+function confirmEdit() {
+  if (!plc.selectedElement) return;
+  const { rungIdx, elIdx } = plc.selectedElement;
+  const el = plc.rungs[rungIdx].elements[elIdx];
+
+  if (el.type === 'mov') {
+    el.movSource = document.getElementById('editMovSource').value.toUpperCase().trim();
+    el.movDest = document.getElementById('editMovDest').value.toUpperCase().trim();
+  } else {
+    el.address = document.getElementById('editAddress').value.toUpperCase().trim();
+  }
+  el.preset = parseInt(document.getElementById('editPreset').value) || 100;
+
+  closeEditModal();
+  drawLadder();
+  showToast('已保存');
+}
+
+function deleteEditingElement() {
+  if (!plc.selectedElement) return;
+  const { rungIdx, elIdx } = plc.selectedElement;
+  plc.rungs[rungIdx].elements.splice(elIdx, 1);
+  closeEditModal();
+  drawLadder();
+  showToast('已删除');
+}
+
+// ==================== PLC Scan Engine ====================
+function toggleRun() {
+  plc.isRunning = !plc.isRunning;
+  const btn = document.getElementById('runBtn');
+  const status = document.getElementById('runStatus');
+
+  if (plc.isRunning) {
+    btn.innerHTML = '⏹ 停止';
+    btn.classList.add('running');
+    status.classList.add('active');
+    status.querySelector('span:last-child').textContent = '运行中';
+    startScanLoop();
+    showToast('仿真运行中', 'success');
+  } else {
+    btn.innerHTML = '▶ 运行';
+    btn.classList.remove('running');
+    status.classList.remove('active');
+    status.querySelector('span:last-child').textContent = '已停止';
+    stopScanLoop();
+    showToast('已停止');
+  }
+}
+
+function startScanLoop() {
+  stopScanLoop();
+  const interval = 100 / plc.speed;
+  plc.scanTimer = setInterval(scanOnce, interval);
+}
+
+function stopScanLoop() {
+  if (plc.scanTimer) { clearInterval(plc.scanTimer); plc.scanTimer = null; }
+}
+
+function stepRun() { scanOnce(); showToast('单步执行完成'); }
+
+function scanOnce() {
+  plc.scanCount++;
+
+  const newOutputs = new Array(8).fill(false);
+  const newRelays = new Array(32).fill(false);
+
+  plc.rungs.forEach(rung => {
+    let powerFlow = true;
+
+    for (const el of rung.elements) {
+      if (el.type === 'mov') {
+        // MOV instruction: when powerFlow is true, execute data move
+        if (powerFlow) {
+          executeMOV(el);
+        }
+        // MOV does not change powerFlow
+        continue;
+      }
+
+      const m = el.address ? el.address.match(/([XYMTC])(\d+)/) : null;
+      if (!m) continue;
+      const type = m[1], idx = parseInt(m[2]);
+
+      switch (el.type) {
+        case 'contact-no':
+          if (powerFlow) {
+            powerFlow = (type === 'X' ? plc.inputs[idx] :
+                         type === 'Y' ? plc.outputs[idx] :
+                         type === 'M' ? plc.relays[idx] :
+                         type === 'T' ? plc.timers[idx]?.done :
+                         type === 'C' ? plc.counters[idx]?.done : false);
+          }
+          break;
+
+        case 'contact-nc':
+          if (powerFlow) {
+            powerFlow = !(type === 'X' ? plc.inputs[idx] :
+                          type === 'Y' ? plc.outputs[idx] :
+                          type === 'M' ? plc.relays[idx] :
+                          type === 'T' ? plc.timers[idx]?.done :
+                          type === 'C' ? plc.counters[idx]?.done : false);
+          }
+          break;
+
+        case 'coil':
+          if (powerFlow) {
+            if (type === 'Y') newOutputs[idx] = true;
+            if (type === 'M') newRelays[idx] = true;
+          }
+          break;
+
+        case 'timer':
+          if (type === 'T' && idx < 8) {
+            const timer = plc.timers[idx];
+            if (powerFlow && !timer.enabled) {
+              timer.enabled = true;
+              timer.current = 0;
+              timer.preset = el.preset || 100;
+              timer.done = false;
+            }
+            if (!powerFlow) {
+              timer.enabled = false;
+              timer.current = 0;
+              timer.done = false;
+            }
+            if (timer.enabled && !timer.done) {
+              timer.current++;
+              if (timer.current >= timer.preset) timer.done = true;
+            }
+            if (timer.done) powerFlow = true;
+          }
+          break;
+
+        case 'counter':
+          if (type === 'C' && idx < 8) {
+            const counter = plc.counters[idx];
+            if (powerFlow && !counter.done) {
+              if (!counter.enabled) {
+                counter.enabled = true;
+                counter.current = 0;
+                counter.preset = el.preset || 10;
+              }
+              if (!counter._prevPower) {
+                counter.current++;
+                if (counter.current >= counter.preset) {
+                  counter.done = true;
+                  powerFlow = true;
+                }
+              }
+            }
+            counter._prevPower = powerFlow;
+            if (counter.done) powerFlow = true;
+          }
+          break;
+
+        case 'set':
+          if (powerFlow) {
+            if (type === 'Y') newOutputs[idx] = true;
+            if (type === 'M') newRelays[idx] = true;
+          }
+          break;
+
+        case 'reset':
+          if (powerFlow) {
+            if (type === 'Y') newOutputs[idx] = false;
+            if (type === 'M') newRelays[idx] = false;
+          }
+          break;
+      }
+    }
+  });
+
+  plc.outputs = newOutputs;
+  plc.relays = newRelays;
+
+  updateIODisplay();
+  updateDataDisplay();
+  drawLadder();
+}
+
+// ==================== MOV Execution ====================
+function executeMOV(el) {
+  const src = el.movSource ? el.movSource.toUpperCase().trim() : '';
+  const dst = el.movDest ? el.movDest.toUpperCase().trim() : '';
+  if (!src || !dst) return;
+
+  let value = 0;
+
+  // Parse source
+  if (src.startsWith('K')) {
+    // Constant value K123 or K-456 or K12.5
+    const numStr = src.substring(1);
+    value = parseFloat(numStr);
+  } else if (src.startsWith('DD')) {
+    // DINT register as source
+    const idx = parseInt(src.substring(2));
+    if (!isNaN(idx) && idx >= 0 && idx < 8) {
+      value = plc.dataDint[idx].value;
+    }
+  } else if (src.startsWith('D')) {
+    // INT register as source
+    const idx = parseInt(src.substring(1));
+    if (!isNaN(idx) && idx >= 0 && idx < 16) {
+      value = plc.dataInt[idx].value;
+    }
+  } else if (src.startsWith('X') || src.startsWith('Y') || src.startsWith('M')) {
+    // Bit to value (true=1, false=0)
+    const type = src[0];
+    const idx = parseInt(src.substring(1));
+    let bitVal = false;
+    if (type === 'X' && idx < 8) bitVal = plc.inputs[idx];
+    else if (type === 'Y' && idx < 8) bitVal = plc.outputs[idx];
+    else if (type === 'M' && idx < 32) bitVal = plc.relays[idx];
+    value = bitVal ? 1 : 0;
+  }
+
+  // Write to destination
+  if (dst.startsWith('DD')) {
+    const idx = parseInt(dst.substring(2));
+    if (!isNaN(idx) && idx >= 0 && idx < 8) {
+      // Clamp to DINT range
+      value = Math.max(-2147483648, Math.min(2147483647, value));
+      plc.dataDint[idx].value = value;
+    }
+  } else if (dst.startsWith('D')) {
+    const idx = parseInt(dst.substring(1));
+    if (!isNaN(idx) && idx >= 0 && idx < 16) {
+      // Clamp to INT range
+      value = Math.max(-32768, Math.min(32767, value));
+      plc.dataInt[idx].value = value;
+    }
+  } else if (dst.startsWith('Y') || dst.startsWith('M')) {
+    const type = dst[0];
+    const idx = parseInt(dst.substring(1));
+    const bitVal = value !== 0;
+    if (type === 'Y' && idx < 8) plc.outputs[idx] = bitVal;
+    else if (type === 'M' && idx < 32) plc.relays[idx] = bitVal;
+  }
+}
+
+function resetAll() {
+  if (plc.isRunning) toggleRun();
+  plc.inputs.fill(false);
+  plc.outputs.fill(false);
+  plc.relays.fill(false);
+  plc.scanCount = 0;
+  plc.dataInt.forEach(d => d.value = 0);
+  plc.dataDint.forEach(d => d.value = 0);
+  plc.timers.forEach(t => { t.current = 0; t.enabled = false; t.done = false; });
+  plc.counters.forEach(c => { c.current = 0; c.enabled = false; c.done = false; c._prevPower = false; });
+  updateIODisplay();
+  updateDataDisplay();
+  drawLadder();
+  showToast('全部复位');
+}
+
+function setSpeed(spd, btn) {
+  plc.speed = spd;
+  document.querySelectorAll('.speed-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  if (plc.isRunning) startScanLoop();
+}
+
+// ==================== IO Display ====================
+function updateIODisplay() {
+  // Inputs
+  const inputGrid = document.getElementById('inputGrid');
+  if (inputGrid.children.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'io-input-btn';
+      btn.innerHTML = `<span class="io-label">X${i}</span><span class="io-status">OFF</span>`;
+      btn.addEventListener('click', () => {
+        plc.inputs[i] = !plc.inputs[i];
+        updateIODisplay();
+        if (!plc.isRunning) drawLadder();
+      });
+      inputGrid.appendChild(btn);
+    }
+  }
+  Array.from(inputGrid.children).forEach((btn, i) => {
+    btn.classList.toggle('on', plc.inputs[i]);
+    btn.querySelector('.io-status').textContent = plc.inputs[i] ? 'ON' : 'OFF';
+  });
+
+  // Outputs
+  const outputGrid = document.getElementById('outputGrid');
+  if (outputGrid.children.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      const div = document.createElement('div');
+      div.className = 'io-output-led';
+      div.innerHTML = `<div class="led-circle"></div><span class="io-label">Y${i}</span>`;
+      outputGrid.appendChild(div);
+    }
+  }
+  Array.from(outputGrid.children).forEach((div, i) => {
+    div.classList.toggle('on', plc.outputs[i]);
+  });
+
+  // Timers
+  const timerList = document.getElementById('timerList');
+  if (timerList.children.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      const div = document.createElement('div');
+      div.className = 'device-card';
+      div.innerHTML = `
+        <div class="device-info"><div class="device-icon">T</div><span class="device-name">T${i}</span></div>
+        <div class="device-values"><span class="device-cv">0</span><span class="device-pv">/ 100</span></div>
+        <span class="device-badge">停止</span>`;
+      timerList.appendChild(div);
+    }
+  }
+  plc.timers.forEach((t, i) => {
+    const card = timerList.children[i];
+    card.classList.toggle('active', t.enabled);
+    card.querySelector('.device-cv').textContent = t.current;
+    card.querySelector('.device-pv').textContent = '/ ' + t.preset;
+    card.querySelector('.device-badge').textContent = t.done ? '完成' : (t.enabled ? '计时中' : '停止');
+  });
+
+  // Counters
+  const counterList = document.getElementById('counterList');
+  if (counterList.children.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      const div = document.createElement('div');
+      div.className = 'device-card';
+      div.innerHTML = `
+        <div class="device-info"><div class="device-icon">C</div><span class="device-name">C${i}</span></div>
+        <div class="device-values"><span class="device-cv">0</span><span class="device-pv">/ 10</span></div>
+        <span class="device-badge">停止</span>`;
+      counterList.appendChild(div);
+    }
+  }
+  plc.counters.forEach((c, i) => {
+    const card = counterList.children[i];
+    card.classList.toggle('active', c.enabled);
+    card.querySelector('.device-cv').textContent = c.current;
+    card.querySelector('.device-pv').textContent = '/ ' + c.preset;
+    card.querySelector('.device-badge').textContent = c.done ? '完成' : (c.enabled ? '计数中' : '停止');
+  });
+}
+
+// ==================== Data Display ====================
+function updateDataDisplay() {
+  // INT registers
+  const intList = document.getElementById('dataIntList');
+  if (intList.children.length === 0) {
+    for (let i = 0; i < 16; i++) {
+      const div = document.createElement('div');
+      div.className = 'data-card';
+      div.innerHTML = `
+        <div class="data-info"><div class="data-icon">D</div><span class="data-name">D${i}</span><span class="data-type">INT</span></div>
+        <span class="data-value">0</span>`;
+      intList.appendChild(div);
+    }
+  }
+  plc.dataInt.forEach((d, i) => {
+    const card = intList.children[i];
+    const valEl = card.querySelector('.data-value');
+    valEl.textContent = d.value;
+    valEl.classList.toggle('negative', d.value < 0);
+    valEl.classList.toggle('float', !Number.isInteger(d.value));
+  });
+
+  // DINT registers
+  const dintList = document.getElementById('dataDintList');
+  if (dintList.children.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      const div = document.createElement('div');
+      div.className = 'data-card';
+      div.innerHTML = `
+        <div class="data-info"><div class="data-icon">DD</div><span class="data-name">DD${i}</span><span class="data-type">DINT</span></div>
+        <span class="data-value">0</span>`;
+      dintList.appendChild(div);
+    }
+  }
+  plc.dataDint.forEach((d, i) => {
+    const card = dintList.children[i];
+    const valEl = card.querySelector('.data-value');
+    valEl.textContent = d.value;
+    valEl.classList.toggle('negative', d.value < 0);
+    valEl.classList.toggle('float', !Number.isInteger(d.value));
+  });
+
+  // Relays
+  const relayGrid = document.getElementById('relayGrid');
+  if (relayGrid.children.length === 0) {
+    for (let i = 0; i < 16; i++) {
+      const div = document.createElement('div');
+      div.className = 'io-output-led';
+      div.innerHTML = `<div class="led-circle"></div><span class="io-label">M${i}</span>`;
+      relayGrid.appendChild(div);
+    }
+  }
+  Array.from(relayGrid.children).forEach((div, i) => {
+    div.classList.toggle('on', plc.relays[i]);
+  });
+}
+
+// ==================== Examples ====================
+function loadExample(name) {
+  clearAll();
+  switch(name) {
+    case 'traffic':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'coil', address:'Y0', preset:100 },
+          { id:'e3', type:'timer', address:'T0', preset:50 }
+        ]},
+        { elements: [
+          { id:'e4', type:'contact-no', address:'T0', preset:100 },
+          { id:'e5', type:'coil', address:'Y1', preset:100 },
+          { id:'e6', type:'timer', address:'T1', preset:30 }
+        ]},
+        { elements: [
+          { id:'e7', type:'contact-no', address:'T1', preset:100 },
+          { id:'e8', type:'coil', address:'Y2', preset:100 }
+        ]}
+      ];
+      plc.timers[0].preset = 50;
+      plc.timers[1].preset = 30;
+      break;
+
+    case 'motor':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'contact-no', address:'Y0', preset:100 },
+          { id:'e3', type:'coil', address:'Y0', preset:100 }
+        ]},
+        { elements: [
+          { id:'e4', type:'contact-no', address:'X1', preset:100 },
+          { id:'e5', type:'contact-nc', address:'Y0', preset:100 },
+          { id:'e6', type:'coil', address:'M0', preset:100 }
+        ]}
+      ];
+      break;
+
+    case 'flash':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'timer', address:'T0', preset:30 },
+          { id:'e3', type:'coil', address:'Y0', preset:100 }
+        ]},
+        { elements: [
+          { id:'e4', type:'contact-no', address:'T0', preset:100 },
+          { id:'e5', type:'timer', address:'T1', preset:30 },
+          { id:'e6', type:'coil', address:'Y1', preset:100 }
+        ]},
+        { elements: [
+          { id:'e7', type:'contact-no', address:'T1', preset:100 },
+          { id:'e8', type:'timer', address:'T2', preset:30 },
+          { id:'e9', type:'coil', address:'Y2', preset:100 }
+        ]},
+        { elements: [
+          { id:'e10', type:'contact-no', address:'T2', preset:100 },
+          { id:'e11', type:'timer', address:'T3', preset:30 },
+          { id:'e12', type:'coil', address:'Y3', preset:100 }
+        ]}
+      ];
+      break;
+
+    case 'counter':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'counter', address:'C0', preset:5 }
+        ]},
+        { elements: [
+          { id:'e3', type:'contact-no', address:'C0', preset:5 },
+          { id:'e4', type:'coil', address:'Y0', preset:100 }
+        ]}
+      ];
+      plc.counters[0].preset = 5;
+      break;
+
+    case 'alarm':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'contact-no', address:'X1', preset:100 },
+          { id:'e3', type:'coil', address:'Y0', preset:100 }
+        ]},
+        { elements: [
+          { id:'e4', type:'contact-no', address:'X0', preset:100 },
+          { id:'e5', type:'contact-no', address:'X2', preset:100 },
+          { id:'e6', type:'coil', address:'Y1', preset:100 }
+        ]},
+        { elements: [
+          { id:'e7', type:'contact-no', address:'Y0', preset:100 },
+          { id:'e8', type:'contact-no', address:'Y1', preset:100 },
+          { id:'e9', type:'timer', address:'T0', preset:20 },
+          { id:'e10', type:'coil', address:'Y2', preset:100 }
+        ]}
+      ];
+      plc.timers[0].preset = 20;
+      break;
+
+    case 'mov_demo':
+      plc.rungs = [
+        { elements: [
+          { id:'e1', type:'contact-no', address:'X0', preset:100 },
+          { id:'e2', type:'mov', address:'', preset:100, movSource:'K100', movDest:'D0' }
+        ]},
+        { elements: [
+          { id:'e3', type:'contact-no', address:'X1', preset:100 },
+          { id:'e4', type:'mov', address:'', preset:100, movSource:'K-500', movDest:'D1' }
+        ]},
+        { elements: [
+          { id:'e5', type:'contact-no', address:'X2', preset:100 },
+          { id:'e6', type:'mov', address:'', preset:100, movSource:'D0', movDest:'DD0' }
+        ]},
+        { elements: [
+          { id:'e7', type:'contact-no', address:'X3', preset:100 },
+          { id:'e8', type:'mov', address:'', preset:100, movSource:'K12345', movDest:'DD1' }
+        ]},
+        { elements: [
+          { id:'e9', type:'contact-no', address:'D0', preset:100 },
+          { id:'e10', type:'coil', address:'Y0', preset:100 }
+        ]}
+      ];
+      break;
+  }
+
+  plc.selectedRung = plc.rungs.length - 1;
+  resizeCanvas();
+  drawLadder();
+  switchTab('program', document.querySelector('.nav-tab'));
+  showToast('已加载: ' + name);
+}
+
+// ==================== Import/Export ====================
+function showExportModal() {
+  const data = {
+    rungs: plc.rungs,
+    version: '2.0',
+    name: 'PLC程序',
+    created: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'plc_program_' + Date.now() + '.plc';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('导出成功', 'success');
+}
+
+function showImportModal() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.plc,.json';
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.rungs) {
+          plc.rungs = data.rungs;
+          resizeCanvas();
+          drawLadder();
+          showToast('导入成功', 'success');
+        }
+      } catch(err) {
+        showToast('文件格式错误', 'error');
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+function saveToLocal() {
+  try {
+    localStorage.setItem('plc_sim_v2', JSON.stringify({ rungs: plc.rungs }));
+    showToast('保存成功', 'success');
+  } catch(e) {
+    showToast('保存失败', 'error');
+  }
+}
+
+// ==================== Init ====================
+function init() {
+  resizeCanvas();
+  updateIODisplay();
+  updateDataDisplay();
+  window.addEventListener('resize', resizeCanvas);
+
+  // WeChat detection
+  if (navigator.userAgent.toLowerCase().includes('micromessenger')) {
+    console.log('WeChat detected');
+  }
+
+  // Auto load
+  try {
+    const saved = localStorage.getItem('plc_sim_v2');
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.rungs && data.rungs.length > 0) {
+        plc.rungs = data.rungs;
+        resizeCanvas();
+        drawLadder();
+      }
+    }
+  } catch(e) {}
+
+  if (plc.rungs.length === 0) {
+    loadExample('traffic');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
