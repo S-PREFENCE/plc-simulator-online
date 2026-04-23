@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>PLC 仿真器 Pro v4.0</title>
+<title>PLC 仿真器 Pro v4.1</title>
 <style>
 :root {
   --primary:#2563eb;--primary-light:#3b82f6;--primary-dark:#1d4ed8;--primary-bg:#eff6ff;
@@ -118,40 +118,81 @@ input,select,textarea{font-family:inherit;outline:none}
 .io-output-led .io-label{font-size:12px;font-weight:700;color:var(--text-secondary);transition:all 0.3s}
 .io-output-led.on .io-label{color:var(--success)}
 
-/* Collapsible */
-.collapse-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:10px 14px;margin-bottom:8px;background:var(--bg);border-radius:var(--radius-md);border:1px solid var(--border-light);transition:all 0.2s}
-.collapse-header:active{background:var(--surface-hover)}
-.collapse-header .ch-left{display:flex;align-items:center;gap:8px}
-.collapse-header .ch-icon{font-size:16px}
-.collapse-header .ch-title{font-size:13px;font-weight:700;color:var(--text)}
-.collapse-header .ch-count{font-size:10px;color:var(--text-muted);background:var(--surface);padding:1px 8px;border-radius:20px;font-weight:600}
-.collapse-header .ch-arrow{font-size:12px;color:var(--text-muted);transition:transform 0.25s}
-.collapse-header.open .ch-arrow{transform:rotate(180deg)}
-.collapse-body{display:none;padding:0 4px}
-.collapse-body.open{display:block}
+/* ===== Variable Definition Table (v4.1 NEW) ===== */
+.var-table-page{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.var-table-header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border-light);flex-shrink:0}
+.var-table-title{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px}
+.var-table-title::before{content:'📋';font-size:17px}
+.var-table-count{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--primary-bg);color:var(--primary);font-weight:600}
+.var-table-search{flex:1;position:relative}
+.var-table-search input{width:100%;height:34px;padding:0 12px 0 32px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:13px;background:var(--bg);transition:all 0.2s}
+.var-table-search input:focus{border-color:var(--primary);background:var(--surface);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.var-table-search input::placeholder{color:var(--text-muted)}
+.var-table-search::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
 
-/* Device Card */
-.device-card{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:6px;background:var(--bg);border-radius:var(--radius-md);border-left:3px solid var(--border);transition:all 0.2s}
-.device-card.active{border-left-color:var(--primary);background:var(--primary-bg);box-shadow:0 0 8px rgba(37,99,235,0.08)}
-.device-card .device-info{display:flex;align-items:center;gap:8px}
-.device-card .device-icon{width:28px;height:28px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-muted);box-shadow:var(--shadow-sm)}
-.device-card.active .device-icon{background:var(--primary);color:#fff}
-.device-card .device-name{font-size:13px;font-weight:700;color:var(--text)}
-.device-card .device-values{display:flex;align-items:center;gap:8px}
-.device-card .device-cv{font-size:16px;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
-.device-card .device-pv{font-size:11px;color:var(--text-muted);font-weight:500}
-.device-card .device-badge{font-size:10px;padding:3px 10px;border-radius:20px;background:var(--surface);color:var(--text-muted);font-weight:600;box-shadow:var(--shadow-sm)}
-.device-card.active .device-badge{background:var(--primary);color:#fff}
+.var-table-body{flex:1;overflow-y:auto;padding:0}
+.var-type-group{margin:0}
+.var-type-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-bottom:1px solid var(--border-light);cursor:pointer;transition:all 0.15s;position:sticky;top:0;z-index:2}
+.var-type-header:active{background:var(--surface-hover)}
+.var-type-header.open{background:var(--surface)}
+.var-type-left{display:flex;align-items:center;gap:8px}
+.var-type-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.var-type-icon.x{background:var(--info-bg);color:var(--info)}
+.var-type-icon.y{background:var(--success-light);color:var(--success)}
+.var-type-icon.m{background:#f3e8ff;color:#8b5cf6}
+.var-type-icon.t{background:var(--warning-bg);color:var(--warning)}
+.var-type-icon.c{background:var(--danger-bg);color:var(--danger)}
+.var-type-icon.d{background:var(--primary-bg);color:var(--primary)}
+.var-type-icon.dd{background:#fef3c7;color:#d97706}
+.var-type-name{font-size:13px;font-weight:700;color:var(--text)}
+.var-type-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--surface);color:var(--text-muted);font-weight:600;border:1px solid var(--border-light)}
+.var-type-arrow{font-size:11px;color:var(--text-muted);transition:transform 0.25s}
+.var-type-header.open .var-type-arrow{transform:rotate(180deg)}
 
-/* Data Register Card */
-.data-card{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;margin-bottom:5px;background:var(--bg);border-radius:var(--radius-md);border-left:3px solid var(--border);transition:all 0.2s}
-.data-card:hover{background:var(--surface-hover)}
-.data-card .data-info{display:flex;align-items:center;gap:8px}
-.data-card .data-icon{width:26px;height:26px;border-radius:6px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary);box-shadow:var(--shadow-sm)}
-.data-card .data-name{font-size:12px;font-weight:600;color:var(--text)}
-.data-card .data-type{font-size:9px;color:var(--text-muted);background:var(--surface);padding:1px 6px;border-radius:4px;margin-left:4px}
-.data-card .data-value{font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;min-width:60px;text-align:right}
-.data-card .data-value.negative{color:var(--danger)}
+.var-type-body{display:none}
+.var-type-body.open{display:block}
+
+/* Table-like rows */
+.var-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border-light);background:var(--surface);transition:background 0.15s;gap:10px;min-height:52px}
+.var-row:active{background:var(--bg)}
+.var-row-highlight{background:var(--primary-bg) !important}
+.var-row .var-addr{min-width:44px;font-size:13px;font-weight:700;font-family:var(--font-mono);color:var(--primary);flex-shrink:0}
+.var-row .var-addr.x-addr{color:var(--info)}
+.var-row .var-addr.y-addr{color:var(--success)}
+.var-row .var-addr.m-addr{color:#8b5cf6}
+.var-row .var-addr.t-addr{color:var(--warning)}
+.var-row .var-addr.c-addr{color:var(--danger)}
+.var-row .var-addr.d-addr{color:var(--primary)}
+.var-row .var-addr.dd-addr{color:#d97706}
+
+.var-row .var-status{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#d1d5db;transition:all 0.2s}
+.var-row .var-status.on{background:var(--success);box-shadow:0 0 8px var(--success-glow)}
+
+.var-row .var-value{min-width:52px;text-align:right;font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono);font-variant-numeric:tabular-nums;flex-shrink:0}
+.var-row .var-value.negative{color:var(--danger)}
+.var-row .var-value.bit-on{color:var(--success)}
+.var-row .var-value.type-label{font-size:10px;color:var(--text-muted);font-weight:500;background:var(--bg);padding:2px 6px;border-radius:4px}
+
+.var-row .var-comment{flex:1;font-size:12px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.var-row .var-comment.empty{color:var(--text-muted);font-style:italic;font-weight:400}
+.var-row .var-comment-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all 0.15s;color:var(--text-muted)}
+.var-row .var-comment-btn:hover{background:var(--primary-bg);color:var(--primary)}
+
+.var-row .var-preset-info{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);flex-shrink:0}
+
+/* Variable toolbar */
+.var-table-toolbar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface);border-top:1px solid var(--border-light);flex-shrink:0}
+.var-toolbar-btn{height:30px;padding:0 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;color:var(--text-secondary);background:var(--bg);display:flex;align-items:center;gap:4px;transition:all 0.15s;border:1px solid var(--border-light)}
+.var-toolbar-btn:active{background:var(--primary-bg);color:var(--primary)}
+.var-toolbar-btn.primary-btn{background:var(--primary);color:#fff;border-color:var(--primary)}
+.var-toolbar-btn.primary-btn:active{background:var(--primary-dark)}
+.var-toolbar-info{margin-left:auto;font-size:10px;color:var(--text-muted)}
+
+/* Empty state */
+.var-empty{padding:40px 20px;text-align:center}
+.var-empty-icon{font-size:40px;margin-bottom:10px;opacity:0.5}
+.var-empty-text{font-size:14px;color:var(--text-muted);font-weight:500}
+.var-empty-sub{font-size:12px;color:var(--text-muted);margin-top:6px;opacity:0.7}
 
 /* Project Page */
 .project-page{padding:12px;overflow-y:auto}
@@ -240,11 +281,14 @@ input,select,textarea{font-family:inherit;outline:none}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .animate-in{animation:fadeIn 0.3s ease}
 
-/* Search bar for device lookup */
-.search-bar{padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border-light);flex-shrink:0}
-.search-input{width:100%;height:36px;padding:0 14px 0 34px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:13px;background:var(--bg);position:relative}
-.search-wrap{position:relative}
-.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+/* Comment edit popup */
+.comment-popup{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1200}
+.comment-popup.show{display:flex}
+.comment-popup-card{width:90%;max-width:360px;background:var(--surface);border-radius:var(--radius-xl);padding:20px;box-shadow:var(--shadow-lg)}
+.comment-popup-card h3{font-size:15px;font-weight:700;margin-bottom:14px;color:var(--text)}
+.comment-popup-card input{width:100%;height:42px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;background:var(--bg);margin-bottom:12px}
+.comment-popup-card input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.comment-popup-btns{display:flex;gap:8px;justify-content:flex-end}
 
 @media (orientation:landscape) and (max-height:500px){
   .app-header{height:40px;padding:0 10px}
@@ -267,7 +311,7 @@ input,select,textarea{font-family:inherit;outline:none}
     <div class="header-left">
       <div class="header-logo">⚡</div>
       <span class="header-title">PLC 仿真器</span>
-      <span class="header-badge">v4.0</span>
+      <span class="header-badge">v4.1</span>
     </div>
     <div class="header-right">
       <div class="run-indicator" id="runStatus">
@@ -286,8 +330,8 @@ input,select,textarea{font-family:inherit;outline:none}
     <button class="nav-tab" onclick="switchTab('io',this)">
       <span class="tab-icon">📊</span><span>IO监控</span>
     </button>
-    <button class="nav-tab" onclick="switchTab('data',this)">
-      <span class="tab-icon">💾</span><span>数据区</span>
+    <button class="nav-tab" onclick="switchTab('vars',this)">
+      <span class="tab-icon">📋</span><span>变量表</span>
     </button>
     <button class="nav-tab" onclick="switchTab('project',this)">
       <span class="tab-icon">📁</span><span>工程</span>
@@ -375,46 +419,23 @@ input,select,textarea{font-family:inherit;outline:none}
       </div>
     </div>
 
-    <!-- Tab 3: 数据区 -->
-    <div class="tab-page io-page" id="tab-data">
-      <div class="io-content" style="padding:12px">
-        <div class="search-bar">
-          <div class="search-wrap">
-            <input class="search-input" id="dataSearch" type="text" placeholder="搜索地址：M0, D5, DD0..." oninput="filterDataDisplay(this.value)">
-          </div>
+    <!-- Tab 3: 变量定义表 (v4.1 NEW - replaces old 数据区) -->
+    <div class="tab-page var-table-page" id="tab-vars">
+      <div class="var-table-header">
+        <span class="var-table-title">变量定义表</span>
+        <span class="var-table-count" id="varTotalCount">0 变量</span>
+        <div class="var-table-search">
+          <input type="text" placeholder="搜索地址/注释..." id="varSearchInput" oninput="filterVarTable()">
         </div>
-        <div id="dataAreaContent">
-          <!-- M0~M15 visible by default -->
-          <div class="io-section">
-            <div class="collapse-header open" onclick="toggleCollapse(this)">
-              <div class="ch-left"><span class="ch-icon">🔄</span><span class="ch-title">中间继电器 M0~M255</span><span class="ch-count" id="mCount">0/256</span></div>
-              <span class="ch-arrow">▼</span>
-            </div>
-            <div class="collapse-body open" id="mBody">
-              <div class="io-grid" id="relayGrid"></div>
-              <div style="padding:8px 0;font-size:11px;color:var(--text-muted);text-align:center" id="mPageInfo">显示 M0~M15 | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline" onclick="showMPageRange()">查看更多</button></div>
-            </div>
-          </div>
-          <div class="io-section">
-            <div class="collapse-header open" onclick="toggleCollapse(this)">
-              <div class="ch-left"><span class="ch-icon">💾</span><span class="ch-title">数据寄存器 D0~D255</span><span class="ch-count" id="dCount">0/256</span></div>
-              <span class="ch-arrow">▼</span>
-            </div>
-            <div class="collapse-body open" id="dBody">
-              <div id="dataIntList"></div>
-              <div style="padding:8px 0;font-size:11px;color:var(--text-muted);text-align:center" id="dPageInfo">显示 D0~D15 | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline" onclick="showDPageRange()">查看更多</button></div>
-            </div>
-          </div>
-          <div class="io-section">
-            <div class="collapse-header" onclick="toggleCollapse(this)">
-              <div class="ch-left"><span class="ch-icon">💾</span><span class="ch-title">双字寄存器 DD0~DD127</span></div>
-              <span class="ch-arrow">▼</span>
-            </div>
-            <div class="collapse-body" id="ddBody">
-              <div id="dataDintList"></div>
-            </div>
-          </div>
-        </div>
+      </div>
+      <div class="var-table-body" id="varTableBody">
+        <!-- Dynamically generated -->
+      </div>
+      <div class="var-table-toolbar">
+        <button class="var-toolbar-btn primary-btn" onclick="addManualVar()">＋ 新增变量</button>
+        <button class="var-toolbar-btn" onclick="autoScanVars()">🔍 扫描程序</button>
+        <button class="var-toolbar-btn" onclick="expandAllVarGroups()">📂 全部展开</button>
+        <span class="var-toolbar-info" id="varFilterInfo"></span>
       </div>
     </div>
 
@@ -615,6 +636,31 @@ input,select,textarea{font-family:inherit;outline:none}
   </div>
 </div>
 
+<!-- Comment Edit Popup -->
+<div class="comment-popup" id="commentPopup">
+  <div class="comment-popup-card">
+    <h3 id="commentPopupTitle">编辑变量注释</h3>
+    <input type="text" id="commentPopupInput" placeholder="输入变量注释/别名..." maxlength="30">
+    <div class="comment-popup-btns">
+      <button class="btn btn-default" onclick="closeCommentPopup()" style="height:38px;padding:0 16px;border-radius:var(--radius-md);font-size:13px;font-weight:600;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)">取消</button>
+      <button class="btn btn-primary" onclick="saveComment()" style="height:38px;padding:0 16px;border-radius:var(--radius-md);font-size:13px;font-weight:600;background:var(--primary);color:#fff;border:none">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Variable Popup -->
+<div class="comment-popup" id="addVarPopup">
+  <div class="comment-popup-card">
+    <h3>新增变量到定义表</h3>
+    <input type="text" id="addVarAddrInput" placeholder="输入地址，如 M10, D5, DD0..." maxlength="10">
+    <input type="text" id="addVarCommentInput" placeholder="注释（可选）" maxlength="30">
+    <div class="comment-popup-btns">
+      <button class="btn btn-default" onclick="closeAddVarPopup()" style="height:38px;padding:0 16px;border-radius:var(--radius-md);font-size:13px;font-weight:600;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border)">取消</button>
+      <button class="btn btn-primary" onclick="confirmAddVar()" style="height:38px;padding:0 16px;border-radius:var(--radius-md);font-size:13px;font-weight:600;background:var(--primary);color:#fff;border:none">添加</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -623,21 +669,13 @@ const plc = {
   inputs: new Array(16).fill(false),
   outputs: new Array(16).fill(false),
   relays: new Array(256).fill(false),
-  // Previous state for edge detection
   _prevRelays: new Array(256).fill(false),
   _prevOutputs: new Array(16).fill(false),
   _prevInputs: new Array(16).fill(false),
-  // Data registers - expanded
-  dataInt: new Array(256).fill(0),   // D0~D255, INT
-  dataDint: new Array(128).fill(0),   // DD0~DD127, DINT
-  // Timers: T0~T15, each supports TON/TOF/TONR
+  dataInt: new Array(256).fill(0),
+  dataDint: new Array(128).fill(0),
   timers: Array.from({length:16}, () => ({
-    type: 'TON',      // TON, TOF, TONR
-    current: 0,
-    preset: 100,
-    enabled: false,
-    done: false,
-    _prevIn: false    // previous input power
+    type: 'TON', current: 0, preset: 100, enabled: false, done: false, _prevIn: false
   })),
   counters: Array.from({length:16}, () => ({
     current: 0, preset: 10, enabled: false, done: false, _prevPower: false
@@ -651,11 +689,9 @@ const plc = {
   scanTimer: null,
   insertMode: null,
   gridClickTarget: null,
-  // Drag state
   dragState: { active: false, ghost: null, sourceEl: null, sourcePos: null, timer: null },
-  // Data display pagination
-  _mPageStart: 0,
-  _dPageStart: 0
+  // v4.1: Variable definition table
+  varComments: {} // { 'X0': '启动按钮', 'Y0': '电机运行', 'M0': '运行标志', ... }
 };
 
 const GRID = {
@@ -704,7 +740,6 @@ function getDataValue(token) {
     const idx = parseInt(t.substring(1));
     return (!isNaN(idx) && idx < 16) ? plc.counters[idx].current : 0;
   }
-  // Bit to int: X/Y/M -> 0 or 1
   const bit = parseAddr(t);
   if (bit) return getBitValue(bit.type, bit.idx) ? 1 : 0;
   return 0;
@@ -741,7 +776,7 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'program') setTimeout(resizeCanvas, 50);
   if (name === 'io') updateIODisplay();
-  if (name === 'data') updateDataDisplay();
+  if (name === 'vars') renderVarTable();
 }
 
 function switchIOTab(id, btn) {
@@ -765,6 +800,299 @@ function showToast(msg, type) {
   t.className = 'toast ' + (type || '');
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==================== Variable Definition Table (v4.1) ====================
+function getAllUsedVars() {
+  const vars = new Map(); // key -> {type, idx, addr, comment}
+
+  function addVar(type, idx) {
+    const addr = type + idx;
+    if (!vars.has(addr)) {
+      vars.set(addr, { type, idx, addr, comment: plc.varComments[addr] || '' });
+    }
+  }
+
+  // Scan all rungs for used addresses
+  plc.rungs.forEach(rung => {
+    for (let row = 0; row < rung.rows; row++) {
+      const rowData = rung.grid[row];
+      if (!rowData) continue;
+      for (let col = 0; col < GRID.maxCols; col++) {
+        const el = rowData[col];
+        if (!el) continue;
+
+        // Parse main address
+        if (el.address) {
+          const p = parseAddr(el.address);
+          if (p) addVar(p.type, p.idx);
+        }
+
+        // Parse MOV addresses
+        if (el.movSource) parseDataAddrToken(el.movSource, addVar);
+        if (el.movDest) parseDataAddrToken(el.movDest, addVar);
+
+        // Parse arithmetic addresses
+        if (el.arithSrc1) parseDataAddrToken(el.arithSrc1, addVar);
+        if (el.arithSrc2) parseDataAddrToken(el.arithSrc2, addVar);
+        if (el.arithDst) parseDataAddrToken(el.arithDst, addVar);
+      }
+    }
+  });
+
+  // Also add manually added vars (from varComments that aren't in program)
+  Object.keys(plc.varComments).forEach(addr => {
+    if (!vars.has(addr)) {
+      const p = parseAddr(addr);
+      if (p) vars.set(addr, { type: p.type, idx: p.idx, addr, comment: plc.varComments[addr] || '' });
+    }
+  });
+
+  return vars;
+}
+
+function parseDataAddrToken(token, addVar) {
+  const t = token.toUpperCase().trim();
+  if (t.startsWith('DD')) {
+    const idx = parseInt(t.substring(2));
+    if (!isNaN(idx) && idx >= 0 && idx < 128) addVar('DD', idx);
+  } else if (t.startsWith('D')) {
+    const idx = parseInt(t.substring(1));
+    if (!isNaN(idx) && idx >= 0 && idx < 256) addVar('D', idx);
+  } else {
+    const p = parseAddr(t);
+    if (p) addVar(p.type, p.idx);
+  }
+}
+
+function renderVarTable() {
+  const vars = getAllUsedVars();
+  const searchQuery = (document.getElementById('varSearchInput')?.value || '').toUpperCase().trim();
+
+  // Group by type
+  const groups = {
+    X: [], Y: [], M: [], T: [], C: [], D: [], DD: []
+  };
+
+  vars.forEach(v => {
+    const matchSearch = !searchQuery ||
+      v.addr.includes(searchQuery) ||
+      (v.comment && v.comment.toUpperCase().includes(searchQuery));
+    if (!matchSearch) return;
+
+    if (v.type === 'X') groups.X.push(v);
+    else if (v.type === 'Y') groups.Y.push(v);
+    else if (v.type === 'M') groups.M.push(v);
+    else if (v.type === 'T') groups.T.push(v);
+    else if (v.type === 'C') groups.C.push(v);
+    else if (v.type === 'D') groups.D.push(v);
+    else if (v.type === 'DD') groups.DD.push(v);
+  });
+
+  const typeNames = { X: '输入 X', Y: '输出 Y', M: '中间继电器 M', T: '定时器 T', C: '计数器 C', D: '数据寄存器 D', DD: '双字寄存器 DD' };
+  const typeColors = { X: 'x', Y: 'y', M: 'm', T: 't', C: 'c', D: 'd', DD: 'dd' };
+
+  let totalCount = vars.size;
+  let filteredCount = Object.values(groups).reduce((sum, arr) => sum + arr.length, 0);
+
+  document.getElementById('varTotalCount').textContent = filteredCount + ' 变量';
+  document.getElementById('varFilterInfo').textContent = searchQuery ? '搜索: ' + searchQuery : '';
+
+  const body = document.getElementById('varTableBody');
+
+  if (filteredCount === 0) {
+    body.innerHTML = '<div class="var-empty">' +
+      '<div class="var-empty-icon">📋</div>' +
+      '<div class="var-empty-text">' + (searchQuery ? '没有找到匹配的变量' : '暂无变量') + '</div>' +
+      '<div class="var-empty-sub">' + (searchQuery ? '尝试其他关键词' : '加载示例程序或手动添加变量后自动生成') + '</div>' +
+      '</div>';
+    return;
+  }
+
+  let html = '';
+  const typeOrder = ['X', 'Y', 'M', 'T', 'C', 'D', 'DD'];
+
+  typeOrder.forEach(type => {
+    const items = groups[type];
+    if (items.length === 0) return;
+
+    items.sort((a, b) => a.idx - b.idx);
+
+    html += '<div class="var-type-group">';
+    html += '<div class="var-type-header open" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\')">';
+    html += '<div class="var-type-left">';
+    html += '<div class="var-type-icon ' + typeColors[type] + '">' + type + '</div>';
+    html += '<span class="var-type-name">' + typeNames[type] + '</span>';
+    html += '</div>';
+    html += '<span class="var-type-badge">' + items.length + '</span>';
+    html += '<span class="var-type-arrow">▼</span>';
+    html += '</div>';
+    html += '<div class="var-type-body open">';
+
+    items.forEach(v => {
+      const addrClass = typeColors[type] + '-addr';
+      let statusOn = false;
+      let valueDisplay = '';
+      let valueClass = '';
+
+      switch (type) {
+        case 'X':
+          statusOn = plc.inputs[v.idx];
+          valueDisplay = statusOn ? 'ON' : 'OFF';
+          valueClass = statusOn ? 'bit-on' : '';
+          break;
+        case 'Y':
+          statusOn = plc.outputs[v.idx];
+          valueDisplay = statusOn ? 'ON' : 'OFF';
+          valueClass = statusOn ? 'bit-on' : '';
+          break;
+        case 'M':
+          statusOn = plc.relays[v.idx];
+          valueDisplay = statusOn ? 'ON' : 'OFF';
+          valueClass = statusOn ? 'bit-on' : '';
+          break;
+        case 'T':
+          statusOn = plc.timers[v.idx].done;
+          const tObj = plc.timers[v.idx];
+          valueDisplay = tObj.current + '/' + tObj.preset;
+          valueClass = '';
+          break;
+        case 'C':
+          statusOn = plc.counters[v.idx].done;
+          const cObj = plc.counters[v.idx];
+          valueDisplay = cObj.current + '/' + cObj.preset;
+          valueClass = '';
+          break;
+        case 'D':
+          const dVal = plc.dataInt[v.idx];
+          valueDisplay = '' + dVal;
+          valueClass = dVal < 0 ? 'negative' : '';
+          break;
+        case 'DD':
+          const ddVal = plc.dataDint[v.idx];
+          valueDisplay = '' + ddVal;
+          valueClass = ddVal < 0 ? 'negative' : '';
+          break;
+      }
+
+      const commentClass = v.comment ? '' : ' empty';
+      const commentText = v.comment || '点击添加注释';
+
+      // For T/C: show type in value
+      let extraValueHtml = '';
+      if (type === 'T') {
+        extraValueHtml = '<span class="var-value type-label">' + plc.timers[v.idx].type + '</span>';
+      }
+
+      html += '<div class="var-row">';
+      html += '<span class="var-status' + (statusOn ? ' on' : '') + '"></span>';
+      html += '<span class="var-addr ' + addrClass + '">' + v.addr + '</span>';
+      html += '<span class="var-value ' + valueClass + '">' + valueDisplay + '</span>';
+      html += extraValueHtml;
+      html += '<span class="var-comment' + commentClass + '" onclick="openCommentPopup(\'' + v.addr + '\')">' + commentText + '</span>';
+      html += '<button class="var-comment-btn" onclick="openCommentPopup(\'' + v.addr + '\')">✏️</button>';
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  body.innerHTML = html;
+}
+
+function filterVarTable() {
+  renderVarTable();
+}
+
+function expandAllVarGroups() {
+  document.querySelectorAll('.var-type-header').forEach(h => {
+    h.classList.add('open');
+    if (h.nextElementSibling) h.nextElementSibling.classList.add('open');
+  });
+}
+
+function openCommentPopup(addr) {
+  document.getElementById('commentPopupTitle').textContent = '编辑 ' + addr + ' 注释';
+  document.getElementById('commentPopupInput').value = plc.varComments[addr] || '';
+  document.getElementById('commentPopup').classList.add('show');
+  document.getElementById('commentPopup')._addr = addr;
+  setTimeout(() => document.getElementById('commentPopupInput').focus(), 100);
+}
+
+function closeCommentPopup() {
+  document.getElementById('commentPopup').classList.remove('show');
+}
+
+function saveComment() {
+  const addr = document.getElementById('commentPopup')._addr;
+  const val = document.getElementById('commentPopupInput').value.trim();
+  if (val) {
+    plc.varComments[addr] = val;
+  } else {
+    delete plc.varComments[addr];
+  }
+  closeCommentPopup();
+  renderVarTable();
+  saveVarComments();
+  showToast('注释已保存', 'success');
+}
+
+function addManualVar() {
+  document.getElementById('addVarAddrInput').value = '';
+  document.getElementById('addVarCommentInput').value = '';
+  document.getElementById('addVarPopup').classList.add('show');
+  setTimeout(() => document.getElementById('addVarAddrInput').focus(), 100);
+}
+
+function closeAddVarPopup() {
+  document.getElementById('addVarPopup').classList.remove('show');
+}
+
+function confirmAddVar() {
+  const addr = document.getElementById('addVarAddrInput').value.toUpperCase().trim();
+  const comment = document.getElementById('addVarCommentInput').value.trim();
+
+  if (!addr) { showToast('请输入地址', 'error'); return; }
+
+  // Validate address
+  let valid = false;
+  const p = parseAddr(addr);
+  if (p) {
+    valid = true;
+  } else if (addr.startsWith('DD')) {
+    const idx = parseInt(addr.substring(2));
+    valid = !isNaN(idx) && idx >= 0 && idx < 128;
+  } else if (addr.startsWith('D') && !addr.startsWith('DD')) {
+    const idx = parseInt(addr.substring(1));
+    valid = !isNaN(idx) && idx >= 0 && idx < 256;
+  }
+
+  if (!valid) { showToast('地址格式不正确', 'error'); return; }
+
+  if (comment) plc.varComments[addr] = comment;
+
+  closeAddVarPopup();
+  renderVarTable();
+  saveVarComments();
+  showToast('已添加 ' + addr, 'success');
+}
+
+function autoScanVars() {
+  renderVarTable();
+  showToast('已扫描程序，发现 ' + getAllUsedVars().size + ' 个变量', 'success');
+}
+
+function saveVarComments() {
+  try {
+    localStorage.setItem('plc_var_comments', JSON.stringify(plc.varComments));
+  } catch(e) {}
+}
+
+function loadVarComments() {
+  try {
+    const saved = localStorage.getItem('plc_var_comments');
+    if (saved) plc.varComments = JSON.parse(saved);
+  } catch(e) {}
 }
 
 // ==================== Grid Ladder Data Structure ====================
@@ -863,7 +1191,7 @@ function drawLadder() {
     ctx.textAlign = 'center';
     ctx.fillText('点击 "+ 梯级" 或选择示例开始编程', W/2, H/2 - 10);
     ctx.font = '400 12px ' + getComputedStyle(document.body).fontFamily;
-    ctx.fillText('v4.0: 并联仿真 · 边沿检测 · TONR/TOF · 拖拽移动', W/2, H/2 + 14);
+    ctx.fillText('v4.1: 变量定义表 · 并联仿真 · 边沿检测 · TONR/TOF', W/2, H/2 + 14);
     return;
   }
 
@@ -973,7 +1301,6 @@ function drawGridElement(el, x, y, w, h, energized) {
       ctx.moveTo(x+w*0.8,cy-h*0.3); ctx.lineTo(x+w*0.8,cy+h*0.3);
       ctx.moveTo(x+w*0.8,cy); ctx.lineTo(x+w-5,cy);
       ctx.stroke();
-      // Rising edge arrow
       ctx.beginPath();
       ctx.moveTo(cx-6,cy+h*0.35); ctx.lineTo(cx+6,cy-h*0.2); ctx.lineTo(cx,cy-h*0.2);
       ctx.stroke();
@@ -985,7 +1312,6 @@ function drawGridElement(el, x, y, w, h, energized) {
       ctx.moveTo(x+w*0.8,cy-h*0.3); ctx.lineTo(x+w*0.8,cy+h*0.3);
       ctx.moveTo(x+w*0.8,cy); ctx.lineTo(x+w-5,cy);
       ctx.stroke();
-      // Falling edge arrow
       ctx.beginPath();
       ctx.moveTo(cx-6,cy-h*0.2); ctx.lineTo(cx+6,cy+h*0.35); ctx.lineTo(cx,cy+h*0.35);
       ctx.stroke();
@@ -1096,7 +1422,6 @@ function onCanvasDown(e) {
   ds.sourceEl = rung.grid[pos.row][pos.col];
 
   if (e.touches) {
-    // Touch: long press to start drag
     ds.timer = setTimeout(() => {
       ds.active = true;
       createDragGhost(ds.sourceEl, clientX, clientY);
@@ -1105,7 +1430,6 @@ function onCanvasDown(e) {
     ds._touchStartX = clientX;
     ds._touchStartY = clientY;
   } else {
-    // Mouse: immediate drag
     ds.active = true;
     createDragGhost(ds.sourceEl, clientX, clientY);
   }
@@ -1123,7 +1447,6 @@ function onCanvasMove(e) {
     ds.ghost.style.top = (clientY - 28) + 'px';
   }
 
-  // Check if touch has moved enough to cancel long-press timer
   if (e.touches && ds.timer && ds._touchStartX !== undefined) {
     const dx = clientX - ds._touchStartX;
     const dy = clientY - ds._touchStartY;
@@ -1151,17 +1474,14 @@ function onCanvasUp(e) {
       const { rungIdx: srcRung, row: srcRow, col: srcCol } = ds.sourcePos;
 
       if (rungIdx === srcRung && row === srcRow && col === srcCol) {
-        // Same position - treat as click to edit
         openEditModal(srcRung, srcRow, srcCol);
       } else {
-        // Move element
         const target = plc.rungs[rungIdx].grid[row][col];
         plc.rungs[srcRung].grid[srcRow][srcCol] = target;
         plc.rungs[rungIdx].grid[row][col] = ds.sourceEl;
         showToast('已移动元件');
       }
     } else {
-      // Dropped outside - revert or treat as click
       if (ds.sourcePos) openEditModal(ds.sourcePos.rungIdx, ds.sourcePos.row, ds.sourcePos.col);
     }
 
@@ -1173,9 +1493,7 @@ function onCanvasUp(e) {
     return;
   }
 
-  // No drag - handle as click
   if (ds.sourcePos && ds.sourceEl) {
-    // Was a tap (not long enough for drag) - treat as click
     const { rungIdx, row, col } = ds.sourcePos;
     if (plc.insertMode) {
       insertElementAt(rungIdx, row, col, plc.insertMode);
@@ -1337,10 +1655,6 @@ function deleteEditingElement() {
 }
 
 // ==================== PLC Scan Engine v4.0 ====================
-// KEY FIX: Outputs and relays are inherited from previous scan, NOT reset.
-// Parallel branches use OR logic.
-// Coils are assignment (=), SET/RST are cumulative.
-
 function toggleRun() {
   plc.isRunning = !plc.isRunning;
   const btn = document.getElementById('runBtn');
@@ -1372,19 +1686,15 @@ function stepRun() { scanOnce(); showToast('单步完成'); }
 function scanOnce() {
   plc.scanCount++;
 
-  // Save previous states for edge detection
   const prevInputs = [...plc.inputs];
   const prevOutputs = [...plc.outputs];
   const prevRelays = [...plc.relays];
 
-  // Coils driven in this scan cycle (to distinguish driven vs inheriting)
-  const coilDriven = new Set(); // "Y0", "M5" etc
-  // SET/RST accumulated results
+  const coilDriven = new Set();
   const setBits = new Set();
   const rstBits = new Set();
 
   plc.rungs.forEach((rung) => {
-    // Evaluate all parallel branches
     const branchResults = [];
 
     for (let row = 0; row < rung.rows; row++) {
@@ -1407,7 +1717,6 @@ function scanOnce() {
             break;
           }
           case 'contact-pu': {
-            // Rising edge: was false, now true => one-scan pulse
             const p = parseAddr(el.address);
             if (p && powerFlow) {
               const prev = getPrevBit(p.type, p.idx, prevInputs, prevOutputs, prevRelays);
@@ -1417,7 +1726,6 @@ function scanOnce() {
             break;
           }
           case 'contact-pd': {
-            // Falling edge: was true, now false => one-scan pulse
             const p = parseAddr(el.address);
             if (p && powerFlow) {
               const prev = getPrevBit(p.type, p.idx, prevInputs, prevOutputs, prevRelays);
@@ -1493,10 +1801,7 @@ function scanOnce() {
       branchResults.push(powerFlow);
     }
 
-    // Handle coils not driven in any branch: they keep their value (already inherited)
-    // Handle coils that were driven by powerFlow=false (need to set to false)
-    // Actually in standard PLC: if a coil is in the rung and powerFlow is false, coil = false
-    // We need to scan again for coil elements with false powerFlow
+    // Handle coils not driven in any branch
     for (let row = 0; row < rung.rows; row++) {
       let powerFlow = true;
       for (let col = 0; col < GRID.maxCols; col++) {
@@ -1537,9 +1842,8 @@ function scanOnce() {
             if (p) {
               const key = p.type + p.idx;
               if (coilDriven.has(key)) {
-                // Already driven by a true-power branch
+                // Already driven
               } else if (!powerFlow) {
-                // Not yet driven, and this branch has no power -> set false
                 if (p.type === 'Y' && p.idx < 16) plc.outputs[p.idx] = false;
                 if (p.type === 'M' && p.idx < 256) plc.relays[p.idx] = false;
                 coilDriven.add(key);
@@ -1552,7 +1856,7 @@ function scanOnce() {
     }
   });
 
-  // Apply SET/RST (accumulative, applied after all rungs)
+  // Apply SET/RST
   setBits.forEach(key => {
     const t = key[0];
     const idx = parseInt(key.substring(1));
@@ -1567,7 +1871,6 @@ function scanOnce() {
   });
 
   updateIODisplay();
-  updateDataDisplay();
   drawLadder();
 }
 
@@ -1582,13 +1885,12 @@ function getPrevBit(type, idx, prevInputs, prevOutputs, prevRelays) {
   }
 }
 
-// ==================== Timer Handler: TON / TOF / TONR ====================
+// ==================== Timer Handler ====================
 function handleTimer(timer, powerFlow) {
   const prevIn = timer._prevIn;
 
   switch (timer.type) {
     case 'TON': {
-      // TON: power ON -> start counting, power OFF -> reset
       if (powerFlow) {
         timer.enabled = true;
         if (!timer.done) {
@@ -1603,13 +1905,11 @@ function handleTimer(timer, powerFlow) {
       break;
     }
     case 'TOF': {
-      // TOF: power ON -> done immediately, power OFF -> start counting down
       if (powerFlow) {
         timer.done = true;
         timer.current = 0;
         timer.enabled = false;
       } else if (prevIn && !powerFlow) {
-        // Just turned off - start timing
         timer.enabled = true;
         timer.current = 0;
         timer.done = false;
@@ -1624,7 +1924,6 @@ function handleTimer(timer, powerFlow) {
       break;
     }
     case 'TONR': {
-      // TONR: power ON -> count up and KEEP value on power OFF
       if (powerFlow) {
         timer.enabled = true;
         if (!timer.done) {
@@ -1633,7 +1932,6 @@ function handleTimer(timer, powerFlow) {
         }
       } else {
         timer.enabled = false;
-        // TONR: DO NOT reset current or done!
       }
       break;
     }
@@ -1669,7 +1967,7 @@ function resetAll() {
   plc.dataDint.fill(0);
   plc.timers.forEach(t => { t.current=0; t.enabled=false; t.done=false; t._prevIn=false; t.type='TON'; });
   plc.counters.forEach(c => { c.current=0; c.enabled=false; c.done=false; c._prevPower=false; });
-  updateIODisplay(); updateDataDisplay(); drawLadder();
+  updateIODisplay(); drawLadder();
   showToast('全部复位');
 }
 
@@ -1747,144 +2045,19 @@ function updateIODisplay() {
   });
 }
 
-// ==================== Data Display with Pagination ====================
-function updateDataDisplay() {
-  // Count active
-  let mActive = plc.relays.filter(r => r).length;
-  document.getElementById('mCount').textContent = mActive + '/256';
-
-  // M relay grid (paginated: show 16 at a time)
-  const relayGrid = document.getElementById('relayGrid');
-  const mStart = plc._mPageStart;
-  const mEnd = Math.min(mStart + 16, 256);
-
-  relayGrid.innerHTML = '';
-  for (let i = mStart; i < mEnd; i++) {
-    const div = document.createElement('div');
-    div.className = 'io-output-led' + (plc.relays[i] ? ' on' : '');
-    div.innerHTML = '<div class="led-circle"></div><span class="io-label">M' + i + '</span>';
-    div.addEventListener('click', () => { plc.relays[i] = !plc.relays[i]; updateDataDisplay(); if (!plc.isRunning) drawLadder(); });
-    relayGrid.appendChild(div);
-  }
-  document.getElementById('mPageInfo').innerHTML = '显示 M' + mStart + '~M' + (mEnd-1) + ' | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline;cursor:pointer" onclick="changeMPage(1)">下一页</button>' + (mStart > 0 ? ' | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline;cursor:pointer" onclick="changeMPage(-1)">上一页</button>' : '');
-
-  // D registers (paginated)
-  const intList = document.getElementById('dataIntList');
-  const dStart = plc._dPageStart;
-  const dEnd = Math.min(dStart + 16, 256);
-
-  intList.innerHTML = '';
-  for (let i = dStart; i < dEnd; i++) {
-    const div = document.createElement('div');
-    div.className = 'data-card';
-    const val = plc.dataInt[i];
-    div.innerHTML = '<div class="data-info"><div class="data-icon">D</div><span class="data-name">D' + i + '</span></div><span class="data-value' + (val < 0 ? ' negative' : '') + '">' + val + '</span>';
-    intList.appendChild(div);
-  }
-  document.getElementById('dPageInfo').innerHTML = '显示 D' + dStart + '~D' + (dEnd-1) + ' | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline;cursor:pointer" onclick="changeDPage(1)">下一页</button>' + (dStart > 0 ? ' | <button style="color:var(--primary);font-size:11px;background:none;border:none;text-decoration:underline;cursor:pointer" onclick="changeDPage(-1)">上一页</button>' : '');
-
-  // DD registers
-  const dintList = document.getElementById('dataDintList');
-  if (dintList.children.length === 0) {
-    for (let i = 0; i < 16; i++) {
-      const div = document.createElement('div');
-      div.className = 'data-card';
-      div.innerHTML = '<div class="data-info"><div class="data-icon">DD</div><span class="data-name">DD' + i + '</span><span class="data-type">DINT</span></div><span class="data-value">0</span>';
-      dintList.appendChild(div);
-    }
-  }
-  plc.dataDint.slice(0, 16).forEach((d, i) => {
-    const card = dintList.children[i];
-    if (card) {
-      const valEl = card.querySelector('.data-value');
-      valEl.textContent = d;
-      valEl.className = 'data-value' + (d < 0 ? ' negative' : '');
-    }
-  });
-}
-
-function changeMPage(dir) {
-  plc._mPageStart = Math.max(0, Math.min(240, plc._mPageStart + dir * 16));
-  updateDataDisplay();
-}
-
-function changeDPage(dir) {
-  plc._dPageStart = Math.max(0, Math.min(240, plc._dPageStart + dir * 16));
-  updateDataDisplay();
-}
-
-function showMPageRange() {
-  const idx = prompt_inline('跳转到 M (0-255):');
-  if (idx !== null) {
-    const n = parseInt(idx);
-    if (!isNaN(n) && n >= 0 && n < 256) {
-      plc._mPageStart = Math.floor(n / 16) * 16;
-      updateDataDisplay();
-    }
-  }
-}
-
-function showDPageRange() {
-  const idx = prompt_inline('跳转到 D (0-255):');
-  if (idx !== null) {
-    const n = parseInt(idx);
-    if (!isNaN(n) && n >= 0 && n < 256) {
-      plc._dPageStart = Math.floor(n / 16) * 16;
-      updateDataDisplay();
-    }
-  }
-}
-
-function prompt_inline(msg) {
-  // Since we can't use native prompt reliably, we use a simple approach
-  const val = window.prompt(msg);
-  return val;
-}
-
-function filterDataDisplay(query) {
-  // Quick filter: if user types M5, jump to that page
-  const q = query.toUpperCase().trim();
-  const mMatch = q.match(/^M(\d+)$/);
-  if (mMatch) {
-    const idx = parseInt(mMatch[1]);
-    if (idx >= 0 && idx < 256) {
-      plc._mPageStart = Math.floor(idx / 16) * 16;
-      updateDataDisplay();
-      // Open M section
-      const mBody = document.getElementById('mBody');
-      if (mBody && !mBody.classList.contains('open')) mBody.classList.add('open');
-      const mHeader = mBody?.previousElementSibling;
-      if (mHeader && !mHeader.classList.contains('open')) mHeader.classList.add('open');
-    }
-    return;
-  }
-  const dMatch = q.match(/^D(\d+)$/);
-  if (dMatch) {
-    const idx = parseInt(dMatch[1]);
-    if (idx >= 0 && idx < 256) {
-      plc._dPageStart = Math.floor(idx / 16) * 16;
-      updateDataDisplay();
-      const dBody = document.getElementById('dBody');
-      if (dBody && !dBody.classList.contains('open')) dBody.classList.add('open');
-      const dHeader = dBody?.previousElementSibling;
-      if (dHeader && !dHeader.classList.contains('open')) dHeader.classList.add('open');
-    }
-    return;
-  }
-}
-
 // ==================== Examples ====================
 function loadExample(name) {
   clearAll();
   switch(name) {
     case 'motor_start_stop':
-      // Classic start-stop with self-holding (parallel)
       plc.rungs = [
         createRungFromData([
           [{type:'contact-no',address:'X0'}, null, {type:'contact-no',address:'Y0'}, null, {type:'coil',address:'Y0'}],
           [{type:'contact-no',address:'X1'}, null, null, null, null]
         ])
       ];
+      // Auto-add comments for this example
+      plc.varComments = { 'X0': '启动按钮', 'X1': '停止按钮', 'Y0': '电机运行' };
       break;
     case 'traffic':
       plc.rungs = [
@@ -1907,6 +2080,7 @@ function loadExample(name) {
           [{type:'contact-no',address:'T3'}, {type:'coil',address:'Y3'}]
         ])
       ];
+      plc.varComments = { 'X0': '启动信号', 'X1': '紧急停止', 'Y0': '红灯', 'Y1': '黄灯', 'Y2': '绿灯', 'Y3': '人行灯', 'T0': '红灯定时', 'T1': '黄灯定时', 'T2': '绿灯延时', 'T3': '人行灯记忆定时' };
       break;
     case 'parallel_demo':
       plc.rungs = [
@@ -1920,6 +2094,7 @@ function loadExample(name) {
           [null, {type:'contact-no',address:'X5'}, null]
         ])
       ];
+      plc.varComments = { 'X0': '信号A', 'X1': '信号B', 'X2': '信号C', 'X3': '条件1', 'X4': '互锁', 'X5': '条件2', 'Y0': '输出A', 'Y1': '输出B', 'Y2': '输出C', 'Y3': '组合输出' };
       break;
     case 'edge_demo':
       plc.rungs = [
@@ -1936,6 +2111,7 @@ function loadExample(name) {
           [{type:'contact-no',address:'M1'}, {type:'mov',movSource:'K200',movDest:'D1'}]
         ])
       ];
+      plc.varComments = { 'X0': '脉冲信号', 'M0': '上升沿标志', 'M1': '下降沿标志', 'D0': '上升沿数据', 'D1': '下降沿数据' };
       break;
     case 'mov_demo':
       plc.rungs = [
@@ -1952,12 +2128,14 @@ function loadExample(name) {
           [{type:'contact-no',address:'X3'}, {type:'sub',arithSrc1:'D0',arithSrc2:'K50',arithDst:'D3'}]
         ])
       ];
+      plc.varComments = { 'X0': '写入D0', 'X1': '写入D1', 'X2': '加法触发', 'X3': '减法触发', 'D0': '操作数1', 'D1': '操作数2', 'D2': '加法结果', 'D3': '减法结果' };
       break;
   }
 
   plc.selectedRung = plc.rungs.length - 1;
   resizeCanvas(); drawLadder();
   switchTab('program', document.querySelector('.nav-tab'));
+  saveVarComments();
   showToast('已加载示例');
 }
 
@@ -1990,7 +2168,7 @@ function createRungFromData(rowData) {
 
 // ==================== Import/Export ====================
 function showExportModal() {
-  const data = { rungs: plc.rungs, version: '4.0', name: 'PLC程序', created: new Date().toISOString() };
+  const data = { rungs: plc.rungs, version: '4.1', varComments: plc.varComments, name: 'PLC程序', created: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2011,6 +2189,8 @@ function showImportModal() {
         const data = JSON.parse(ev.target.result);
         if (data.rungs) {
           plc.rungs = data.rungs;
+          if (data.varComments) plc.varComments = data.varComments;
+          saveVarComments();
           resizeCanvas(); drawLadder();
           showToast('导入成功', 'success');
         }
@@ -2023,22 +2203,33 @@ function showImportModal() {
 
 function saveToLocal() {
   try {
-    localStorage.setItem('plc_sim_v4', JSON.stringify({ rungs: plc.rungs }));
+    localStorage.setItem('plc_sim_v41', JSON.stringify({ rungs: plc.rungs, varComments: plc.varComments }));
     showToast('保存成功', 'success');
   } catch(e) { showToast('保存失败', 'error'); }
 }
 
 // ==================== Init ====================
 function init() {
+  loadVarComments();
   resizeCanvas();
   updateIODisplay();
-  updateDataDisplay();
   window.addEventListener('resize', resizeCanvas);
 
   try {
-    const saved = localStorage.getItem('plc_sim_v4');
+    const saved = localStorage.getItem('plc_sim_v41');
     if (saved) {
       const data = JSON.parse(saved);
+      if (data.rungs && data.rungs.length > 0) {
+        plc.rungs = data.rungs;
+        if (data.varComments) plc.varComments = data.varComments;
+        resizeCanvas(); drawLadder();
+        return;
+      }
+    }
+    // v4.0 backward compat
+    const oldSaved = localStorage.getItem('plc_sim_v4');
+    if (oldSaved) {
+      const data = JSON.parse(oldSaved);
       if (data.rungs && data.rungs.length > 0) {
         plc.rungs = data.rungs;
         resizeCanvas(); drawLadder();
@@ -2047,7 +2238,6 @@ function init() {
     }
   } catch(e) {}
 
-  // Load default example
   loadExample('motor_start_stop');
 }
 
