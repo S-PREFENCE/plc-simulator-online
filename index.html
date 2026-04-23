@@ -4,11 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="format-detection" content="telephone=no">
-<meta name="screen-orientation" content="portrait">
-<meta name="x5-orientation" content="portrait">
-<title>PLC仿真器 - 梯形图编程</title>
+<title>PLC 仿真器 Pro - 梯形图编程</title>
 <style>
 :root {
   --primary:#2563eb;--primary-light:#3b82f6;--primary-dark:#1d4ed8;--primary-bg:#eff6ff;
@@ -60,7 +56,7 @@ input,select,textarea{font-family:inherit;outline:none}
 .tab-page{position:absolute;inset:0;display:none;flex-direction:column}
 .tab-page.active{display:flex}
 
-/* Program Page */
+/* Program Page - Grid Ladder */
 .program-page{flex-direction:column}
 .ladder-toolbar{display:flex;align-items:center;gap:5px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--border-light);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
 .ladder-toolbar::-webkit-scrollbar{display:none}
@@ -71,8 +67,9 @@ input,select,textarea{font-family:inherit;outline:none}
 .tb-btn.danger:active{background:var(--danger-bg)}
 .tb-sep{width:1px;height:22px;background:var(--border);margin:0 3px;flex-shrink:0}
 
-.ladder-canvas-wrap{flex:1;overflow:auto;background:var(--surface);position:relative;background-image:radial-gradient(circle at 1px 1px,#e8ecf1 1px,transparent 0);background-size:20px 20px}
-.ladder-canvas-wrap canvas{display:block;min-width:100%;min-height:100%}
+/* Grid Ladder Canvas */
+.ladder-canvas-wrap{flex:1;overflow:auto;background:var(--surface);position:relative}
+.ladder-canvas-wrap canvas{display:block}
 
 /* Element Bar */
 .element-bar{display:flex;gap:4px;padding:8px 10px 10px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
@@ -122,7 +119,7 @@ input,select,textarea{font-family:inherit;outline:none}
 .io-output-led .io-label{font-size:12px;font-weight:700;color:var(--text-secondary);transition:all 0.3s}
 .io-output-led.on .io-label{color:var(--success)}
 
-/* Device Card (Timer/Counter/Data) */
+/* Device Card */
 .device-card{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:6px;background:var(--bg);border-radius:var(--radius-md);border-left:3px solid var(--border);transition:all 0.2s}
 .device-card.active{border-left-color:var(--primary);background:var(--primary-bg);box-shadow:0 0 8px rgba(37,99,235,0.08)}
 .device-card .device-info{display:flex;align-items:center;gap:8px}
@@ -163,18 +160,6 @@ input,select,textarea{font-family:inherit;outline:none}
 .project-desc{font-size:11px;color:var(--text-muted);margin-top:3px;font-weight:500}
 .project-action{font-size:12px;color:var(--primary);padding:5px 14px;border-radius:var(--radius-sm);background:var(--primary-bg);font-weight:600;transition:all 0.15s}
 .project-action:active{background:var(--primary);color:#fff}
-
-/* Settings Page */
-.settings-page{padding:12px;overflow-y:auto}
-.setting-group{background:var(--surface);border-radius:var(--radius-lg);margin-bottom:12px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);overflow:hidden}
-.setting-group-title{padding:10px 16px;font-size:11px;font-weight:700;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border-light);letter-spacing:0.5px;text-transform:uppercase}
-.setting-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border-light);transition:all 0.15s}
-.setting-item:last-child{border-bottom:none}
-.setting-item:active{background:var(--bg)}
-.setting-label{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);font-weight:500}
-.setting-label .icon{font-size:16px}
-.setting-value{font-size:13px;color:var(--text-muted);font-weight:600}
-.setting-value.highlight{color:var(--primary)}
 
 /* Sim Control */
 .sim-control{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,0.04)}
@@ -225,6 +210,23 @@ input,select,textarea{font-family:inherit;outline:none}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
 
+/* Grid Insert Menu */
+.grid-menu{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:1100;opacity:0;transition:opacity 0.2s}
+.grid-menu.show{display:flex;opacity:1}
+.grid-menu-sheet{width:100%;max-width:480px;background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:0 0 env(safe-area-inset-bottom,0);transform:translateY(100%);transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow-lg)}
+.grid-menu.show .grid-menu-sheet{transform:translateY(0)}
+.grid-menu-header{padding:14px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
+.grid-menu-title{font-size:15px;font-weight:700;color:var(--text)}
+.grid-menu-close{width:30px;height:30px;border-radius:50%;background:var(--bg);font-size:16px;color:var(--text-muted);display:flex;align-items:center;justify-content:center}
+.grid-menu-body{padding:12px 18px;max-height:50vh;overflow-y:auto}
+.grid-menu-section{margin-bottom:12px}
+.grid-menu-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.grid-menu-items{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid-menu-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:var(--radius-md);background:var(--bg);border:1.5px solid transparent;transition:all 0.15s;cursor:pointer}
+.grid-menu-item:active{background:var(--primary-bg);border-color:var(--primary);transform:scale(0.95)}
+.grid-menu-item .gmi-icon{font-size:20px;color:var(--primary);font-weight:600}
+.grid-menu-item .gmi-name{font-size:10px;color:var(--text-secondary);font-weight:500;text-align:center}
+
 /* Animations */
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .animate-in{animation:fadeIn 0.3s ease}
@@ -252,8 +254,8 @@ input,select,textarea{font-family:inherit;outline:none}
   <header class="app-header">
     <div class="header-left">
       <div class="header-logo">⚡</div>
-      <span class="header-title">PLC 仿真器</span>
-      <span class="header-badge">离线版</span>
+      <span class="header-title">PLC 仿真器 Pro</span>
+      <span class="header-badge">网格版</span>
     </div>
     <div class="header-right">
       <div class="run-indicator" id="runStatus">
@@ -289,30 +291,26 @@ input,select,textarea{font-family:inherit;outline:none}
       <div class="ladder-toolbar">
         <button class="tb-btn accent" onclick="addNewRung()">＋ 梯级</button>
         <button class="tb-btn" onclick="deleteRung()">－ 梯级</button>
-        <span class="tb-sep"></span>
-        <button class="tb-btn" onclick="insertElement('contact-no')">常开 ┤├</button>
-        <button class="tb-btn" onclick="insertElement('contact-nc')">常闭 ┤╯</button>
-        <button class="tb-btn" onclick="insertElement('coil')">线圈 ─( )</button>
-        <button class="tb-btn" onclick="insertElement('timer')">定时器 ─[T]</button>
-        <button class="tb-btn" onclick="insertElement('counter')">计数器 ─[C]</button>
-        <button class="tb-btn" onclick="insertElement('mov')">传送 ─[MOV]</button>
+        <button class="tb-btn" onclick="addParallelBranch()">⫴ 并联</button>
+        <button class="tb-btn" onclick="deleteParallelBranch()">╳ 删并联</button>
         <span class="tb-sep"></span>
         <button class="tb-btn" onclick="loadExample('traffic')">🚦交通灯</button>
         <button class="tb-btn" onclick="loadExample('motor')">⚙️电机</button>
+        <button class="tb-btn" onclick="loadExample('parallel_demo')">⫴并联演示</button>
         <button class="tb-btn" onclick="loadExample('mov_demo')">📦MOV传送</button>
       </div>
       <div class="ladder-canvas-wrap" id="canvasWrap">
         <canvas id="ladderCanvas"></canvas>
       </div>
       <div class="element-bar">
-        <button class="el-btn" onclick="insertElement('contact-no')"><span class="el-icon">┤ ├</span><span class="el-name">常开</span></button>
-        <button class="el-btn" onclick="insertElement('contact-nc')"><span class="el-icon">┤ ╯</span><span class="el-name">常闭</span></button>
-        <button class="el-btn" onclick="insertElement('coil')"><span class="el-icon">( )</span><span class="el-name">线圈</span></button>
-        <button class="el-btn" onclick="insertElement('timer')"><span class="el-icon">[T]</span><span class="el-name">定时器</span></button>
-        <button class="el-btn" onclick="insertElement('counter')"><span class="el-icon">[C]</span><span class="el-name">计数器</span></button>
-        <button class="el-btn" onclick="insertElement('set')"><span class="el-icon">[S]</span><span class="el-name">置位</span></button>
-        <button class="el-btn" onclick="insertElement('reset')"><span class="el-icon">[R]</span><span class="el-name">复位</span></button>
-        <button class="el-btn" onclick="insertElement('mov')"><span class="el-icon">[MOV]</span><span class="el-name">传送</span></button>
+        <button class="el-btn" onclick="setInsertMode('contact-no')"><span class="el-icon">┤ ├</span><span class="el-name">常开</span></button>
+        <button class="el-btn" onclick="setInsertMode('contact-nc')"><span class="el-icon">┤╯</span><span class="el-name">常闭</span></button>
+        <button class="el-btn" onclick="setInsertMode('coil')"><span class="el-icon">( )</span><span class="el-name">线圈</span></button>
+        <button class="el-btn" onclick="setInsertMode('timer')"><span class="el-icon">[T]</span><span class="el-name">定时器</span></button>
+        <button class="el-btn" onclick="setInsertMode('counter')"><span class="el-icon">[C]</span><span class="el-name">计数器</span></button>
+        <button class="el-btn" onclick="setInsertMode('set')"><span class="el-icon">[S]</span><span class="el-name">置位</span></button>
+        <button class="el-btn" onclick="setInsertMode('reset')"><span class="el-icon">[R]</span><span class="el-name">复位</span></button>
+        <button class="el-btn" onclick="setInsertMode('mov')"><span class="el-icon">[MOV]</span><span class="el-name">传送</span></button>
         <button class="el-btn danger" onclick="clearAll()"><span class="el-icon">🗑</span><span class="el-name">清空</span></button>
       </div>
     </div>
@@ -392,27 +390,11 @@ input,select,textarea{font-family:inherit;outline:none}
           </div>
           <button class="project-action">加载</button>
         </div>
-        <div class="project-card" onclick="loadExample('flash')">
-          <div class="project-icon orange">💡</div>
+        <div class="project-card" onclick="loadExample('parallel_demo')">
+          <div class="project-icon purple">⫴</div>
           <div class="project-info">
-            <div class="project-name">流水灯</div>
-            <div class="project-desc">4盏LED依次点亮 · 定时器链</div>
-          </div>
-          <button class="project-action">加载</button>
-        </div>
-        <div class="project-card" onclick="loadExample('counter')">
-          <div class="project-icon purple">🔢</div>
-          <div class="project-info">
-            <div class="project-name">产品计数</div>
-            <div class="project-desc">计数器应用 · 达到设定值触发</div>
-          </div>
-          <button class="project-action">加载</button>
-        </div>
-        <div class="project-card" onclick="loadExample('alarm')">
-          <div class="project-icon red">🚨</div>
-          <div class="project-info">
-            <div class="project-name">报警系统</div>
-            <div class="project-desc">多条件报警 · 定时延时</div>
+            <div class="project-name">并联分支演示</div>
+            <div class="project-desc">并联触点 · 并联线圈 · 复杂逻辑</div>
           </div>
           <button class="project-action">加载</button>
         </div>
@@ -511,6 +493,78 @@ input,select,textarea{font-family:inherit;outline:none}
   </div>
 </div>
 
+<!-- Grid Insert Menu -->
+<div class="grid-menu" id="gridMenu">
+  <div class="grid-menu-sheet">
+    <div class="grid-menu-header">
+      <span class="grid-menu-title" id="gridMenuTitle">插入元件</span>
+      <button class="grid-menu-close" onclick="closeGridMenu()">✕</button>
+    </div>
+    <div class="grid-menu-body">
+      <div class="grid-menu-section">
+        <div class="grid-menu-section-title">基本触点</div>
+        <div class="grid-menu-items">
+          <div class="grid-menu-item" onclick="insertFromMenu('contact-no')">
+            <span class="gmi-icon">┤├</span>
+            <span class="gmi-name">常开触点</span>
+          </div>
+          <div class="grid-menu-item" onclick="insertFromMenu('contact-nc')">
+            <span class="gmi-icon">┤╯</span>
+            <span class="gmi-name">常闭触点</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-menu-section">
+        <div class="grid-menu-section-title">线圈输出</div>
+        <div class="grid-menu-items">
+          <div class="grid-menu-item" onclick="insertFromMenu('coil')">
+            <span class="gmi-icon">( )</span>
+            <span class="gmi-name">线圈</span>
+          </div>
+          <div class="grid-menu-item" onclick="insertFromMenu('set')">
+            <span class="gmi-icon">[S]</span>
+            <span class="gmi-name">置位</span>
+          </div>
+          <div class="grid-menu-item" onclick="insertFromMenu('reset')">
+            <span class="gmi-icon">[R]</span>
+            <span class="gmi-name">复位</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-menu-section">
+        <div class="grid-menu-section-title">功能指令</div>
+        <div class="grid-menu-items">
+          <div class="grid-menu-item" onclick="insertFromMenu('timer')">
+            <span class="gmi-icon">[T]</span>
+            <span class="gmi-name">定时器</span>
+          </div>
+          <div class="grid-menu-item" onclick="insertFromMenu('counter')">
+            <span class="gmi-icon">[C]</span>
+            <span class="gmi-name">计数器</span>
+          </div>
+          <div class="grid-menu-item" onclick="insertFromMenu('mov')">
+            <span class="gmi-icon">[MOV]</span>
+            <span class="gmi-name">传送</span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-menu-section">
+        <div class="grid-menu-section-title">操作</div>
+        <div class="grid-menu-items">
+          <div class="grid-menu-item" onclick="deleteGridElement()">
+            <span class="gmi-icon" style="color:var(--danger)">🗑</span>
+            <span class="gmi-name" style="color:var(--danger)">删除</span>
+          </div>
+          <div class="grid-menu-item" onclick="closeGridMenu()">
+            <span class="gmi-icon">✕</span>
+            <span class="gmi-name">取消</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -520,9 +574,7 @@ const plc = {
   inputs: new Array(8).fill(false),
   outputs: new Array(8).fill(false),
   relays: new Array(32).fill(false),
-  // INT registers: D0-D15, range -32768 ~ 32767
   dataInt: Array.from({length:16}, () => ({value:0, type:'INT'})),
-  // DINT registers: DD0-DD7, range -2147483648 ~ 2147483647
   dataDint: Array.from({length:8}, () => ({value:0, type:'DINT'})),
   timers: Array.from({length:8}, () => ({current:0, preset:100, enabled:false, done:false})),
   counters: Array.from({length:8}, () => ({current:0, preset:10, enabled:false, done:false, _prevPower:false})),
@@ -532,7 +584,20 @@ const plc = {
   rungs: [],
   selectedRung: -1,
   selectedElement: null,
-  scanTimer: null
+  scanTimer: null,
+  // Grid state
+  insertMode: null, // 'contact-no', 'contact-nc', etc.
+  gridClickTarget: null // {rungIdx, row, col}
+};
+
+// Grid config
+const GRID = {
+  cellW: 90,
+  cellH: 55,
+  busW: 50,
+  rungGap: 10,
+  maxCols: 8,
+  maxRowsPerRung: 3
 };
 
 // ==================== Tab Switch ====================
@@ -555,9 +620,21 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ==================== Ladder Data ====================
+// ==================== Grid Ladder Data Structure ====================
+// Each rung has a grid: rows x cols matrix
+// Each cell can be: null, or {type, address, preset, movSource, movDest}
+// Parallel branches are represented by multiple rows in a rung
+
+function createEmptyRung() {
+  return {
+    rows: 1,
+    cols: 0,
+    grid: [[null, null, null, null, null, null, null, null]] // 1 row, 8 cols max
+  };
+}
+
 function addNewRung() {
-  plc.rungs.push({ elements: [] });
+  plc.rungs.push(createEmptyRung());
   plc.selectedRung = plc.rungs.length - 1;
   resizeCanvas();
   drawLadder();
@@ -574,24 +651,54 @@ function deleteRung() {
   }
 }
 
-function insertElement(type) {
-  if (plc.rungs.length === 0) addNewRung();
-  const rung = plc.rungs[plc.rungs.length - 1];
-  rung.elements.push({
-    id: 'el_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
-    type: type,
-    address: '',
-    preset: 100,
-    // MOV specific
-    movSource: '',
-    movDest: ''
-  });
+// Add a parallel branch to the selected rung
+function addParallelBranch() {
+  if (plc.selectedRung < 0 || plc.selectedRung >= plc.rungs.length) {
+    showToast('请先选择一个梯级', 'error');
+    return;
+  }
+  const rung = plc.rungs[plc.selectedRung];
+  if (rung.rows >= GRID.maxRowsPerRung) {
+    showToast('最多支持 ' + GRID.maxRowsPerRung + ' 行并联', 'error');
+    return;
+  }
+  rung.rows++;
+  rung.grid.push(new Array(GRID.maxCols).fill(null));
+  resizeCanvas();
   drawLadder();
+  showToast('已添加并联分支');
+}
+
+function deleteParallelBranch() {
+  if (plc.selectedRung < 0 || plc.selectedRung >= plc.rungs.length) {
+    showToast('请先选择一个梯级', 'error');
+    return;
+  }
+  const rung = plc.rungs[plc.selectedRung];
+  if (rung.rows <= 1) {
+    showToast('当前梯级没有并联分支', 'error');
+    return;
+  }
+  rung.rows--;
+  rung.grid.pop();
+  resizeCanvas();
+  drawLadder();
+  showToast('已删除并联分支');
+}
+
+function setInsertMode(type) {
+  plc.insertMode = type;
+  const names = {
+    'contact-no': '常开触点', 'contact-nc': '常闭触点', 'coil': '线圈',
+    'timer': '定时器', 'counter': '计数器', 'set': '置位', 'reset': '复位', 'mov': 'MOV传送'
+  };
+  showToast('已选择: ' + names[type] + '，点击网格插入');
 }
 
 function clearAll() {
   plc.rungs = [];
   plc.selectedRung = -1;
+  plc.insertMode = null;
   resizeCanvas();
   drawLadder();
   showToast('已清空梯形图');
@@ -605,11 +712,12 @@ function resizeCanvas() {
   const wrap = document.getElementById('canvasWrap');
   if (!wrap) return;
   const dpr = window.devicePixelRatio || 1;
-  const h = Math.max(wrap.clientHeight, plc.rungs.length * 80 + 120);
-  canvas.width = wrap.clientWidth * dpr;
-  canvas.height = h * dpr;
-  canvas.style.width = wrap.clientWidth + 'px';
-  canvas.style.height = h + 'px';
+  const totalH = plc.rungs.length * (GRID.maxRowsPerRung * GRID.cellH + GRID.rungGap + 30) + 60;
+  const W = Math.max(wrap.clientWidth, GRID.busW * 2 + GRID.maxCols * GRID.cellW + 40);
+  canvas.width = W * dpr;
+  canvas.height = Math.max(totalH, wrap.clientHeight) * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = Math.max(totalH, wrap.clientHeight) + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   drawLadder();
 }
@@ -620,12 +728,12 @@ function drawLadder() {
 
   ctx.clearRect(0, 0, W, H);
 
-  // Grid dots
-  ctx.fillStyle = '#e2e8f0';
+  // Grid dots background
+  ctx.fillStyle = '#e8ecf1';
   for (let x = 0; x < W; x += 20) {
     for (let y = 0; y < H; y += 20) {
       ctx.beginPath();
-      ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+      ctx.arc(x, y, 0.6, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -636,97 +744,121 @@ function drawLadder() {
     ctx.textAlign = 'center';
     ctx.fillText('点击 "+ 梯级" 或选择示例开始编程', W/2, H/2 - 10);
     ctx.font = '400 12px ' + getComputedStyle(document.body).fontFamily;
-    ctx.fillText('支持常开/常闭触点、线圈、定时器、计数器、MOV传送', W/2, H/2 + 14);
+    ctx.fillText('支持串联、并联、功能块指令', W/2, H/2 + 14);
     return;
   }
 
-  const leftBus = 55;
-  const rightBus = W - 35;
-  const rungH = 80;
-  const startY = 35;
+  const leftBus = GRID.busW;
+  const rightBus = leftBus + GRID.maxCols * GRID.cellW + 20;
 
-  // Left bus
-  ctx.strokeStyle = '#334155';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(leftBus, startY);
-  ctx.lineTo(leftBus, startY + plc.rungs.length * rungH);
-  ctx.stroke();
+  let currentY = 20;
 
-  // Right bus
-  ctx.beginPath();
-  ctx.moveTo(rightBus, startY);
-  ctx.lineTo(rightBus, startY + plc.rungs.length * rungH);
-  ctx.stroke();
-
-  // Rungs
   plc.rungs.forEach((rung, ri) => {
-    const y = startY + ri * rungH + rungH / 2;
+    const rungH = rung.rows * GRID.cellH;
+    const rungTop = currentY;
+    const rungBottom = rungTop + rungH + 20;
 
-    // Rung number
-    ctx.fillStyle = plc.selectedRung === ri ? '#2563eb' : '#94a3b8';
-    ctx.font = '600 11px ' + getComputedStyle(document.body).fontFamily;
-    ctx.textAlign = 'right';
-    ctx.fillText('N' + (ri + 1), leftBus - 12, y + 4);
-
-    // Selected background
+    // Rung background
     if (plc.selectedRung === ri) {
       ctx.fillStyle = 'rgba(37,99,235,0.04)';
-      ctx.fillRect(leftBus + 2, startY + ri * rungH + 2, rightBus - leftBus - 4, rungH - 4);
+      ctx.fillRect(4, rungTop, W - 8, rungH + 20);
       ctx.strokeStyle = 'rgba(37,99,235,0.15)';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]);
-      ctx.strokeRect(leftBus + 2, startY + ri * rungH + 2, rightBus - leftBus - 4, rungH - 4);
+      ctx.strokeRect(4, rungTop, W - 8, rungH + 20);
       ctx.setLineDash([]);
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillRect(4, rungTop, W - 8, rungH + 20);
     }
 
-    // Connect left bus
-    if (rung.elements.length > 0) {
-      const elState = getElementEnergized(rung.elements[0]);
-      ctx.strokeStyle = elState ? '#10b981' : '#334155';
-      ctx.lineWidth = elState ? 2.5 : 2;
+    // Rung number
+    ctx.fillStyle = plc.selectedRung === ri ? '#2563eb' : '#94a3b8';
+    ctx.font = '700 12px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'left';
+    ctx.fillText('N' + (ri + 1), 10, rungTop + 16);
+
+    // Left bus bar
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(leftBus, rungTop + 10);
+    ctx.lineTo(leftBus, rungBottom - 10);
+    ctx.stroke();
+
+    // Right bus bar
+    ctx.beginPath();
+    ctx.moveTo(rightBus, rungTop + 10);
+    ctx.lineTo(rightBus, rungBottom - 10);
+    ctx.stroke();
+
+    // Draw each row (parallel branches)
+    for (let row = 0; row < rung.rows; row++) {
+      const rowY = rungTop + 20 + row * GRID.cellH + GRID.cellH / 2;
+
+      // Left bus connection for this row
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(leftBus, y);
-      ctx.lineTo(leftBus + 18, y);
+      ctx.moveTo(leftBus, rowY);
+      ctx.lineTo(leftBus + 15, rowY);
+      ctx.stroke();
+
+      // Right bus connection for this row
+      ctx.beginPath();
+      ctx.moveTo(rightBus - 15, rowY);
+      ctx.lineTo(rightBus, rowY);
+      ctx.stroke();
+
+      // Draw elements in this row
+      for (let col = 0; col < GRID.maxCols; col++) {
+        const el = rung.grid[row][col];
+        const cellX = leftBus + 20 + col * GRID.cellW;
+        const cellCenterX = cellX + GRID.cellW / 2;
+
+        if (el) {
+          const energized = getElementEnergized(el, ri, row);
+          drawGridElement(el, cellX, rowY - GRID.cellH/2 + 5, GRID.cellW - 10, GRID.cellH - 10, energized);
+        }
+
+        // Connection line to next cell
+        if (col < GRID.maxCols - 1) {
+          const nextEl = rung.grid[row][col + 1];
+          const hasCurrent = el || nextEl;
+          ctx.strokeStyle = hasCurrent ? '#334155' : '#cbd5e1';
+          ctx.lineWidth = hasCurrent ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(cellX + GRID.cellW - 5, rowY);
+          ctx.lineTo(cellX + GRID.cellW + 5, rowY);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw parallel branch connections (vertical lines connecting rows)
+    if (rung.rows > 1) {
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      
+      // Left side vertical connection
+      ctx.beginPath();
+      ctx.moveTo(leftBus + 15, rungTop + 20 + GRID.cellH / 2);
+      ctx.lineTo(leftBus + 15, rungTop + 20 + (rung.rows - 1) * GRID.cellH + GRID.cellH / 2);
+      ctx.stroke();
+
+      // Right side vertical connection
+      ctx.beginPath();
+      ctx.moveTo(rightBus - 15, rungTop + 20 + GRID.cellH / 2);
+      ctx.lineTo(rightBus - 15, rungTop + 20 + (rung.rows - 1) * GRID.cellH + GRID.cellH / 2);
       ctx.stroke();
     }
 
-    // Elements
-    const elGap = Math.min(90, (rightBus - leftBus - 70) / Math.max(rung.elements.length, 1));
-    let curX = leftBus + 18;
-
-    rung.elements.forEach((el, ei) => {
-      const energized = getElementEnergized(el);
-      drawElement(el, curX, y, energized, elGap);
-
-      // Connection to next
-      const nextX = curX + elGap;
-      ctx.strokeStyle = energized ? '#10b981' : '#334155';
-      ctx.lineWidth = energized ? 2.5 : 2;
-      ctx.beginPath();
-      ctx.moveTo(curX + elGap - 12, y);
-      ctx.lineTo(nextX + 6, y);
-      ctx.stroke();
-
-      curX = nextX;
-    });
-
-    // Connect last to right bus
-    if (rung.elements.length > 0) {
-      const lastEl = rung.elements[rung.elements.length - 1];
-      const lastEnergized = getElementEnergized(lastEl);
-      ctx.strokeStyle = lastEnergized ? '#10b981' : '#334155';
-      ctx.lineWidth = lastEnergized ? 2.5 : 2;
-      ctx.beginPath();
-      ctx.moveTo(curX + 6, y);
-      ctx.lineTo(rightBus, y);
-      ctx.stroke();
-    }
+    currentY = rungBottom + GRID.rungGap;
   });
 }
 
-function drawElement(el, x, y, energized, gap) {
+function drawGridElement(el, x, y, w, h, energized) {
   const color = energized ? '#10b981' : '#334155';
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -734,48 +866,48 @@ function drawElement(el, x, y, energized, gap) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
 
-  const w = gap - 24;
-  const h = 22;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
 
   switch (el.type) {
     case 'contact-no':
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w*0.18, y);
-      ctx.moveTo(x + w*0.18, y - h*0.65);
-      ctx.lineTo(x + w*0.18, y + h*0.65);
-      ctx.moveTo(x + w*0.82, y - h*0.65);
-      ctx.lineTo(x + w*0.82, y + h*0.65);
-      ctx.moveTo(x + w*0.82, y);
-      ctx.lineTo(x + w, y);
+      ctx.moveTo(x + 5, cy);
+      ctx.lineTo(x + w * 0.2, cy);
+      ctx.moveTo(x + w * 0.2, cy - h * 0.3);
+      ctx.lineTo(x + w * 0.2, cy + h * 0.3);
+      ctx.moveTo(x + w * 0.8, cy - h * 0.3);
+      ctx.lineTo(x + w * 0.8, cy + h * 0.3);
+      ctx.moveTo(x + w * 0.8, cy);
+      ctx.lineTo(x + w - 5, cy);
       ctx.stroke();
       break;
 
     case 'contact-nc':
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w*0.18, y);
-      ctx.moveTo(x + w*0.18, y - h*0.65);
-      ctx.lineTo(x + w*0.18, y + h*0.65);
-      ctx.moveTo(x + w*0.82, y - h*0.65);
-      ctx.lineTo(x + w*0.82, y + h*0.65);
-      ctx.moveTo(x + w*0.32, y - h*0.75);
-      ctx.lineTo(x + w*0.68, y + h*0.75);
-      ctx.moveTo(x + w*0.82, y);
-      ctx.lineTo(x + w, y);
+      ctx.moveTo(x + 5, cy);
+      ctx.lineTo(x + w * 0.2, cy);
+      ctx.moveTo(x + w * 0.2, cy - h * 0.3);
+      ctx.lineTo(x + w * 0.2, cy + h * 0.3);
+      ctx.moveTo(x + w * 0.8, cy - h * 0.3);
+      ctx.lineTo(x + w * 0.8, cy + h * 0.3);
+      ctx.moveTo(x + w * 0.3, cy - h * 0.35);
+      ctx.lineTo(x + w * 0.7, cy + h * 0.35);
+      ctx.moveTo(x + w * 0.8, cy);
+      ctx.lineTo(x + w - 5, cy);
       ctx.stroke();
       break;
 
     case 'coil':
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w*0.22, y);
-      ctx.arc(x + w*0.5, y, h*0.42, 0, Math.PI * 2);
-      ctx.moveTo(x + w*0.78, y);
-      ctx.lineTo(x + w, y);
+      ctx.moveTo(x + 5, cy);
+      ctx.lineTo(x + w * 0.25, cy);
+      ctx.arc(cx, cy, h * 0.3, 0, Math.PI * 2);
+      ctx.moveTo(x + w * 0.75, cy);
+      ctx.lineTo(x + w - 5, cy);
       ctx.stroke();
       if (energized) {
-        ctx.fillStyle = 'rgba(16,185,129,0.1)';
+        ctx.fillStyle = 'rgba(16,185,129,0.12)';
         ctx.fill();
       }
       break;
@@ -785,61 +917,59 @@ function drawElement(el, x, y, energized, gap) {
     case 'set':
     case 'reset':
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w*0.12, y);
-      ctx.rect(x + w*0.12, y - h*0.6, w*0.76, h*1.2);
-      ctx.moveTo(x + w*0.88, y);
-      ctx.lineTo(x + w, y);
+      ctx.moveTo(x + 5, cy);
+      ctx.lineTo(x + w * 0.1, cy);
+      ctx.rect(x + w * 0.1, y + h * 0.15, w * 0.8, h * 0.7);
+      ctx.moveTo(x + w * 0.9, cy);
+      ctx.lineTo(x + w - 5, cy);
       ctx.stroke();
       if (energized) {
-        ctx.fillStyle = 'rgba(37,99,235,0.06)';
-        ctx.fillRect(x + w*0.12, y - h*0.6, w*0.76, h*1.2);
+        ctx.fillStyle = 'rgba(37,99,235,0.08)';
+        ctx.fillRect(x + w * 0.1, y + h * 0.15, w * 0.8, h * 0.7);
       }
       ctx.fillStyle = color;
-      ctx.font = 'bold 11px ' + getComputedStyle(document.body).fontFamily;
+      ctx.font = 'bold 10px ' + getComputedStyle(document.body).fontFamily;
       ctx.textAlign = 'center';
       const label = el.address || (el.type === 'timer' ? 'T?' : el.type === 'counter' ? 'C?' : el.type === 'set' ? 'S?' : 'R?');
-      ctx.fillText(label, x + w*0.5, y + 4);
+      ctx.fillText(label, cx, cy + 3);
       break;
 
     case 'mov':
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w*0.08, y);
-      ctx.rect(x + w*0.08, y - h*0.65, w*0.84, h*1.3);
-      ctx.moveTo(x + w*0.92, y);
-      ctx.lineTo(x + w, y);
+      ctx.moveTo(x + 5, cy);
+      ctx.lineTo(x + w * 0.05, cy);
+      ctx.rect(x + w * 0.05, y + h * 0.1, w * 0.9, h * 0.8);
+      ctx.moveTo(x + w * 0.95, cy);
+      ctx.lineTo(x + w - 5, cy);
       ctx.stroke();
       if (energized) {
         ctx.fillStyle = 'rgba(245,158,11,0.08)';
-        ctx.fillRect(x + w*0.08, y - h*0.65, w*0.84, h*1.3);
+        ctx.fillRect(x + w * 0.05, y + h * 0.1, w * 0.9, h * 0.8);
       }
       ctx.fillStyle = color;
       ctx.font = 'bold 9px ' + getComputedStyle(document.body).fontFamily;
       ctx.textAlign = 'center';
-      ctx.fillText('MOV', x + w*0.5, y - 2);
-      ctx.font = '9px ' + getComputedStyle(document.body).fontFamily;
+      ctx.fillText('MOV', cx, cy - 2);
+      ctx.font = '8px ' + getComputedStyle(document.body).fontFamily;
       const src = el.movSource || '?';
       const dst = el.movDest || '?';
-      ctx.fillText(src + '→' + dst, x + w*0.5, y + 10);
+      ctx.fillText(src + '→' + dst, cx, cy + 8);
       break;
   }
 
-  // Address label
+  // Address label above element
   if (el.address && el.type !== 'timer' && el.type !== 'counter' && el.type !== 'mov') {
     ctx.fillStyle = energized ? '#059669' : '#64748b';
-    ctx.font = '500 10px ' + getComputedStyle(document.body).fontFamily;
+    ctx.font = '500 9px ' + getComputedStyle(document.body).fontFamily;
     ctx.textAlign = 'center';
-    ctx.fillText(el.address, x + w/2, y - h*0.8 - 5);
+    ctx.fillText(el.address, cx, y + 10);
   }
 }
 
-function getElementEnergized(el) {
-  if (!el.address && el.type !== 'mov') return false;
-  if (el.type === 'mov') {
-    // MOV is energized when its input condition is true
-    return false; // Will be computed during scan
-  }
+function getElementEnergized(el, rungIdx, rowIdx) {
+  if (!el) return false;
+  if (el.type === 'mov') return false;
+  if (!el.address) return false;
   const m = el.address.match(/([XYMTC])(\d+)/);
   if (!m) return false;
   const t = m[1], idx = parseInt(m[2]);
@@ -858,46 +988,116 @@ canvas.addEventListener('click', function(e) {
   const rect = canvas.getBoundingClientRect();
   const mx = e.clientX - rect.left;
   const my = e.clientY - rect.top;
-  const rungH = 80;
-  const startY = 35;
 
-  const ri = Math.floor((my - startY) / rungH);
-  if (ri >= 0 && ri < plc.rungs.length) {
-    plc.selectedRung = ri;
+  // Find which rung was clicked
+  let currentY = 20;
+  for (let ri = 0; ri < plc.rungs.length; ri++) {
+    const rung = plc.rungs[ri];
+    const rungH = rung.rows * GRID.cellH + 20;
+    const rungTop = currentY;
+    const rungBottom = rungTop + rungH;
 
-    const y = startY + ri * rungH + rungH / 2;
-    const leftBus = 55;
-    const rightBus = rect.width - 35;
-    const elGap = Math.min(90, (rightBus - leftBus - 70) / Math.max(plc.rungs[ri].elements.length, 1));
-    let curX = leftBus + 18;
+    if (my >= rungTop && my <= rungBottom) {
+      plc.selectedRung = ri;
 
-    for (let ei = 0; ei < plc.rungs[ri].elements.length; ei++) {
-      const elW = elGap - 24;
-      if (mx >= curX - 8 && mx <= curX + elW + 18 && my >= y - 22 && my <= y + 22) {
-        openEditModal(ri, ei);
-        break;
+      // Find which cell was clicked
+      const leftBus = GRID.busW;
+      const row = Math.floor((my - rungTop - 20) / GRID.cellH);
+      const col = Math.floor((mx - leftBus - 20) / GRID.cellW);
+
+      if (row >= 0 && row < rung.rows && col >= 0 && col < GRID.maxCols) {
+        plc.gridClickTarget = {rungIdx: ri, row: row, col: col};
+
+        if (plc.insertMode) {
+          // Insert element at this position
+          insertElementAt(ri, row, col, plc.insertMode);
+          plc.insertMode = null;
+        } else if (rung.grid[row][col]) {
+          // Edit existing element
+          openEditModal(ri, row, col);
+        } else {
+          // Show insert menu
+          showGridMenu(ri, row, col);
+        }
       }
-      curX += elGap;
+
+      drawLadder();
+      return;
     }
 
-    drawLadder();
+    currentY = rungBottom + GRID.rungGap;
   }
 });
 
+function insertElementAt(rungIdx, row, col, type) {
+  const rung = plc.rungs[rungIdx];
+  if (!rung.grid[row]) rung.grid[row] = new Array(GRID.maxCols).fill(null);
+  
+  rung.grid[row][col] = {
+    id: 'el_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+    type: type,
+    address: '',
+    preset: 100,
+    movSource: '',
+    movDest: ''
+  };
+  
+  // Update cols count
+  let maxCol = 0;
+  for (let r = 0; r < rung.rows; r++) {
+    for (let c = GRID.maxCols - 1; c >= 0; c--) {
+      if (rung.grid[r] && rung.grid[r][c]) {
+        maxCol = Math.max(maxCol, c + 1);
+        break;
+      }
+    }
+  }
+  rung.cols = maxCol;
+  
+  drawLadder();
+  showToast('已插入元件');
+}
+
+// ==================== Grid Menu ====================
+function showGridMenu(rungIdx, row, col) {
+  plc.gridClickTarget = {rungIdx, row, col};
+  document.getElementById('gridMenu').classList.add('show');
+}
+
+function closeGridMenu() {
+  document.getElementById('gridMenu').classList.remove('show');
+  plc.gridClickTarget = null;
+}
+
+function insertFromMenu(type) {
+  if (!plc.gridClickTarget) return;
+  const {rungIdx, row, col} = plc.gridClickTarget;
+  insertElementAt(rungIdx, row, col, type);
+  closeGridMenu();
+}
+
+function deleteGridElement() {
+  if (!plc.gridClickTarget) return;
+  const {rungIdx, row, col} = plc.gridClickTarget;
+  const rung = plc.rungs[rungIdx];
+  if (rung.grid[row]) {
+    rung.grid[row][col] = null;
+  }
+  closeGridMenu();
+  drawLadder();
+  showToast('已删除');
+}
+
 // ==================== Edit Modal ====================
-function openEditModal(rungIdx, elIdx) {
-  const el = plc.rungs[rungIdx].elements[elIdx];
-  plc.selectedElement = { rungIdx, elIdx };
+function openEditModal(rungIdx, row, col) {
+  const rung = plc.rungs[rungIdx];
+  if (!rung.grid[row] || !rung.grid[row][col]) return;
+  const el = rung.grid[row][col];
+  plc.selectedElement = {rungIdx, row, col};
 
   const typeNames = {
-    'contact-no': '常开触点',
-    'contact-nc': '常闭触点',
-    'coil': '线圈',
-    'timer': '定时器',
-    'counter': '计数器',
-    'set': '置位',
-    'reset': '复位',
-    'mov': 'MOV 传送'
+    'contact-no': '常开触点', 'contact-nc': '常闭触点', 'coil': '线圈',
+    'timer': '定时器', 'counter': '计数器', 'set': '置位', 'reset': '复位', 'mov': 'MOV 传送'
   };
 
   document.getElementById('editModalTitle').textContent = '编辑元件';
@@ -925,8 +1125,10 @@ function closeEditModal() {
 
 function confirmEdit() {
   if (!plc.selectedElement) return;
-  const { rungIdx, elIdx } = plc.selectedElement;
-  const el = plc.rungs[rungIdx].elements[elIdx];
+  const {rungIdx, row, col} = plc.selectedElement;
+  const rung = plc.rungs[rungIdx];
+  if (!rung.grid[row] || !rung.grid[row][col]) return;
+  const el = rung.grid[row][col];
 
   if (el.type === 'mov') {
     el.movSource = document.getElementById('editMovSource').value.toUpperCase().trim();
@@ -943,8 +1145,11 @@ function confirmEdit() {
 
 function deleteEditingElement() {
   if (!plc.selectedElement) return;
-  const { rungIdx, elIdx } = plc.selectedElement;
-  plc.rungs[rungIdx].elements.splice(elIdx, 1);
+  const {rungIdx, row, col} = plc.selectedElement;
+  const rung = plc.rungs[rungIdx];
+  if (rung.grid[row]) {
+    rung.grid[row][col] = null;
+  }
   closeEditModal();
   drawLadder();
   showToast('已删除');
@@ -991,110 +1196,121 @@ function scanOnce() {
   const newOutputs = new Array(8).fill(false);
   const newRelays = new Array(32).fill(false);
 
-  plc.rungs.forEach(rung => {
-    let powerFlow = true;
+  plc.rungs.forEach((rung, ri) => {
+    // Evaluate each row (parallel branch) independently
+    const rowResults = [];
+    
+    for (let row = 0; row < rung.rows; row++) {
+      let powerFlow = true;
+      let rowHasElements = false;
 
-    for (const el of rung.elements) {
-      if (el.type === 'mov') {
-        // MOV instruction: when powerFlow is true, execute data move
-        if (powerFlow) {
-          executeMOV(el);
+      for (let col = 0; col < GRID.maxCols; col++) {
+        const el = rung.grid[row] ? rung.grid[row][col] : null;
+        if (!el) continue;
+        rowHasElements = true;
+
+        if (el.type === 'mov') {
+          if (powerFlow) executeMOV(el);
+          continue;
         }
-        // MOV does not change powerFlow
-        continue;
-      }
 
-      const m = el.address ? el.address.match(/([XYMTC])(\d+)/) : null;
-      if (!m) continue;
-      const type = m[1], idx = parseInt(m[2]);
+        const m = el.address ? el.address.match(/([XYMTC])(\d+)/) : null;
+        if (!m) continue;
+        const type = m[1], idx = parseInt(m[2]);
 
-      switch (el.type) {
-        case 'contact-no':
-          if (powerFlow) {
-            powerFlow = (type === 'X' ? plc.inputs[idx] :
-                         type === 'Y' ? plc.outputs[idx] :
-                         type === 'M' ? plc.relays[idx] :
-                         type === 'T' ? plc.timers[idx]?.done :
-                         type === 'C' ? plc.counters[idx]?.done : false);
-          }
-          break;
-
-        case 'contact-nc':
-          if (powerFlow) {
-            powerFlow = !(type === 'X' ? plc.inputs[idx] :
-                          type === 'Y' ? plc.outputs[idx] :
-                          type === 'M' ? plc.relays[idx] :
-                          type === 'T' ? plc.timers[idx]?.done :
-                          type === 'C' ? plc.counters[idx]?.done : false);
-          }
-          break;
-
-        case 'coil':
-          if (powerFlow) {
-            if (type === 'Y') newOutputs[idx] = true;
-            if (type === 'M') newRelays[idx] = true;
-          }
-          break;
-
-        case 'timer':
-          if (type === 'T' && idx < 8) {
-            const timer = plc.timers[idx];
-            if (powerFlow && !timer.enabled) {
-              timer.enabled = true;
-              timer.current = 0;
-              timer.preset = el.preset || 100;
-              timer.done = false;
+        switch (el.type) {
+          case 'contact-no':
+            if (powerFlow) {
+              powerFlow = (type === 'X' ? plc.inputs[idx] :
+                           type === 'Y' ? plc.outputs[idx] :
+                           type === 'M' ? plc.relays[idx] :
+                           type === 'T' ? plc.timers[idx]?.done :
+                           type === 'C' ? plc.counters[idx]?.done : false);
             }
-            if (!powerFlow) {
-              timer.enabled = false;
-              timer.current = 0;
-              timer.done = false;
-            }
-            if (timer.enabled && !timer.done) {
-              timer.current++;
-              if (timer.current >= timer.preset) timer.done = true;
-            }
-            if (timer.done) powerFlow = true;
-          }
-          break;
+            break;
 
-        case 'counter':
-          if (type === 'C' && idx < 8) {
-            const counter = plc.counters[idx];
-            if (powerFlow && !counter.done) {
-              if (!counter.enabled) {
-                counter.enabled = true;
-                counter.current = 0;
-                counter.preset = el.preset || 10;
+          case 'contact-nc':
+            if (powerFlow) {
+              powerFlow = !(type === 'X' ? plc.inputs[idx] :
+                            type === 'Y' ? plc.outputs[idx] :
+                            type === 'M' ? plc.relays[idx] :
+                            type === 'T' ? plc.timers[idx]?.done :
+                            type === 'C' ? plc.counters[idx]?.done : false);
+            }
+            break;
+
+          case 'coil':
+            if (powerFlow) {
+              if (type === 'Y') newOutputs[idx] = true;
+              if (type === 'M') newRelays[idx] = true;
+            }
+            break;
+
+          case 'timer':
+            if (type === 'T' && idx < 8) {
+              const timer = plc.timers[idx];
+              if (powerFlow && !timer.enabled) {
+                timer.enabled = true;
+                timer.current = 0;
+                timer.preset = el.preset || 100;
+                timer.done = false;
               }
-              if (!counter._prevPower) {
-                counter.current++;
-                if (counter.current >= counter.preset) {
-                  counter.done = true;
-                  powerFlow = true;
+              if (!powerFlow) {
+                timer.enabled = false;
+                timer.current = 0;
+                timer.done = false;
+              }
+              if (timer.enabled && !timer.done) {
+                timer.current++;
+                if (timer.current >= timer.preset) timer.done = true;
+              }
+              if (timer.done) powerFlow = true;
+            }
+            break;
+
+          case 'counter':
+            if (type === 'C' && idx < 8) {
+              const counter = plc.counters[idx];
+              if (powerFlow && !counter.done) {
+                if (!counter.enabled) {
+                  counter.enabled = true;
+                  counter.current = 0;
+                  counter.preset = el.preset || 10;
+                }
+                if (!counter._prevPower) {
+                  counter.current++;
+                  if (counter.current >= counter.preset) {
+                    counter.done = true;
+                    powerFlow = true;
+                  }
                 }
               }
+              counter._prevPower = powerFlow;
+              if (counter.done) powerFlow = true;
             }
-            counter._prevPower = powerFlow;
-            if (counter.done) powerFlow = true;
-          }
-          break;
+            break;
 
-        case 'set':
-          if (powerFlow) {
-            if (type === 'Y') newOutputs[idx] = true;
-            if (type === 'M') newRelays[idx] = true;
-          }
-          break;
+          case 'set':
+            if (powerFlow) {
+              if (type === 'Y') newOutputs[idx] = true;
+              if (type === 'M') newRelays[idx] = true;
+            }
+            break;
 
-        case 'reset':
-          if (powerFlow) {
-            if (type === 'Y') newOutputs[idx] = false;
-            if (type === 'M') newRelays[idx] = false;
-          }
-          break;
+          case 'reset':
+            if (powerFlow) {
+              if (type === 'Y') newOutputs[idx] = false;
+              if (type === 'M') newRelays[idx] = false;
+            }
+            break;
+        }
       }
+      
+      rowResults.push({hasElements: rowHasElements, powerFlow});
     }
+
+    // Parallel branches: OR logic - if any branch has power, the rung has power
+    // But we only execute coils on branches that have power
   });
 
   plc.outputs = newOutputs;
@@ -1113,25 +1329,20 @@ function executeMOV(el) {
 
   let value = 0;
 
-  // Parse source
   if (src.startsWith('K')) {
-    // Constant value K123 or K-456 or K12.5
     const numStr = src.substring(1);
     value = parseFloat(numStr);
   } else if (src.startsWith('DD')) {
-    // DINT register as source
     const idx = parseInt(src.substring(2));
     if (!isNaN(idx) && idx >= 0 && idx < 8) {
       value = plc.dataDint[idx].value;
     }
   } else if (src.startsWith('D')) {
-    // INT register as source
     const idx = parseInt(src.substring(1));
     if (!isNaN(idx) && idx >= 0 && idx < 16) {
       value = plc.dataInt[idx].value;
     }
   } else if (src.startsWith('X') || src.startsWith('Y') || src.startsWith('M')) {
-    // Bit to value (true=1, false=0)
     const type = src[0];
     const idx = parseInt(src.substring(1));
     let bitVal = false;
@@ -1141,18 +1352,15 @@ function executeMOV(el) {
     value = bitVal ? 1 : 0;
   }
 
-  // Write to destination
   if (dst.startsWith('DD')) {
     const idx = parseInt(dst.substring(2));
     if (!isNaN(idx) && idx >= 0 && idx < 8) {
-      // Clamp to DINT range
       value = Math.max(-2147483648, Math.min(2147483647, value));
       plc.dataDint[idx].value = value;
     }
   } else if (dst.startsWith('D')) {
     const idx = parseInt(dst.substring(1));
     if (!isNaN(idx) && idx >= 0 && idx < 16) {
-      // Clamp to INT range
       value = Math.max(-32768, Math.min(32767, value));
       plc.dataInt[idx].value = value;
     }
@@ -1190,7 +1398,6 @@ function setSpeed(spd, btn) {
 
 // ==================== IO Display ====================
 function updateIODisplay() {
-  // Inputs
   const inputGrid = document.getElementById('inputGrid');
   if (inputGrid.children.length === 0) {
     for (let i = 0; i < 8; i++) {
@@ -1210,7 +1417,6 @@ function updateIODisplay() {
     btn.querySelector('.io-status').textContent = plc.inputs[i] ? 'ON' : 'OFF';
   });
 
-  // Outputs
   const outputGrid = document.getElementById('outputGrid');
   if (outputGrid.children.length === 0) {
     for (let i = 0; i < 8; i++) {
@@ -1224,7 +1430,6 @@ function updateIODisplay() {
     div.classList.toggle('on', plc.outputs[i]);
   });
 
-  // Timers
   const timerList = document.getElementById('timerList');
   if (timerList.children.length === 0) {
     for (let i = 0; i < 8; i++) {
@@ -1245,7 +1450,6 @@ function updateIODisplay() {
     card.querySelector('.device-badge').textContent = t.done ? '完成' : (t.enabled ? '计时中' : '停止');
   });
 
-  // Counters
   const counterList = document.getElementById('counterList');
   if (counterList.children.length === 0) {
     for (let i = 0; i < 8; i++) {
@@ -1269,7 +1473,6 @@ function updateIODisplay() {
 
 // ==================== Data Display ====================
 function updateDataDisplay() {
-  // INT registers
   const intList = document.getElementById('dataIntList');
   if (intList.children.length === 0) {
     for (let i = 0; i < 16; i++) {
@@ -1289,7 +1492,6 @@ function updateDataDisplay() {
     valEl.classList.toggle('float', !Number.isInteger(d.value));
   });
 
-  // DINT registers
   const dintList = document.getElementById('dataDintList');
   if (dintList.children.length === 0) {
     for (let i = 0; i < 8; i++) {
@@ -1309,7 +1511,6 @@ function updateDataDisplay() {
     valEl.classList.toggle('float', !Number.isInteger(d.value));
   });
 
-  // Relays
   const relayGrid = document.getElementById('relayGrid');
   if (relayGrid.children.length === 0) {
     for (let i = 0; i < 16; i++) {
@@ -1330,20 +1531,15 @@ function loadExample(name) {
   switch(name) {
     case 'traffic':
       plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'coil', address:'Y0', preset:100 },
-          { id:'e3', type:'timer', address:'T0', preset:50 }
-        ]},
-        { elements: [
-          { id:'e4', type:'contact-no', address:'T0', preset:100 },
-          { id:'e5', type:'coil', address:'Y1', preset:100 },
-          { id:'e6', type:'timer', address:'T1', preset:30 }
-        ]},
-        { elements: [
-          { id:'e7', type:'contact-no', address:'T1', preset:100 },
-          { id:'e8', type:'coil', address:'Y2', preset:100 }
-        ]}
+        createRungWithElements([
+          [{type:'contact-no', address:'X0'}, {type:'coil', address:'Y0'}, {type:'timer', address:'T0', preset:50}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'T0'}, {type:'coil', address:'Y1'}, {type:'timer', address:'T1', preset:30}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'T1'}, {type:'coil', address:'Y2'}]
+        ])
       ];
       plc.timers[0].preset = 50;
       plc.timers[1].preset = 30;
@@ -1351,102 +1547,45 @@ function loadExample(name) {
 
     case 'motor':
       plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'contact-no', address:'Y0', preset:100 },
-          { id:'e3', type:'coil', address:'Y0', preset:100 }
-        ]},
-        { elements: [
-          { id:'e4', type:'contact-no', address:'X1', preset:100 },
-          { id:'e5', type:'contact-nc', address:'Y0', preset:100 },
-          { id:'e6', type:'coil', address:'M0', preset:100 }
-        ]}
+        createRungWithElements([
+          [{type:'contact-no', address:'X0'}, {type:'contact-no', address:'Y0'}, {type:'coil', address:'Y0'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'X1'}, {type:'contact-nc', address:'Y0'}, {type:'coil', address:'M0'}]
+        ])
       ];
       break;
 
-    case 'flash':
+    case 'parallel_demo':
       plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'timer', address:'T0', preset:30 },
-          { id:'e3', type:'coil', address:'Y0', preset:100 }
-        ]},
-        { elements: [
-          { id:'e4', type:'contact-no', address:'T0', preset:100 },
-          { id:'e5', type:'timer', address:'T1', preset:30 },
-          { id:'e6', type:'coil', address:'Y1', preset:100 }
-        ]},
-        { elements: [
-          { id:'e7', type:'contact-no', address:'T1', preset:100 },
-          { id:'e8', type:'timer', address:'T2', preset:30 },
-          { id:'e9', type:'coil', address:'Y2', preset:100 }
-        ]},
-        { elements: [
-          { id:'e10', type:'contact-no', address:'T2', preset:100 },
-          { id:'e11', type:'timer', address:'T3', preset:30 },
-          { id:'e12', type:'coil', address:'Y3', preset:100 }
-        ]}
+        createRungWithElements([
+          [{type:'contact-no', address:'X0'}, null, {type:'coil', address:'Y0'}],
+          [{type:'contact-no', address:'X1'}, null, {type:'coil', address:'Y1'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'X2'}, {type:'contact-nc', address:'X3'}, {type:'coil', address:'Y2'}],
+          [null, {type:'contact-no', address:'X4'}, null]
+        ])
       ];
-      break;
-
-    case 'counter':
-      plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'counter', address:'C0', preset:5 }
-        ]},
-        { elements: [
-          { id:'e3', type:'contact-no', address:'C0', preset:5 },
-          { id:'e4', type:'coil', address:'Y0', preset:100 }
-        ]}
-      ];
-      plc.counters[0].preset = 5;
-      break;
-
-    case 'alarm':
-      plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'contact-no', address:'X1', preset:100 },
-          { id:'e3', type:'coil', address:'Y0', preset:100 }
-        ]},
-        { elements: [
-          { id:'e4', type:'contact-no', address:'X0', preset:100 },
-          { id:'e5', type:'contact-no', address:'X2', preset:100 },
-          { id:'e6', type:'coil', address:'Y1', preset:100 }
-        ]},
-        { elements: [
-          { id:'e7', type:'contact-no', address:'Y0', preset:100 },
-          { id:'e8', type:'contact-no', address:'Y1', preset:100 },
-          { id:'e9', type:'timer', address:'T0', preset:20 },
-          { id:'e10', type:'coil', address:'Y2', preset:100 }
-        ]}
-      ];
-      plc.timers[0].preset = 20;
       break;
 
     case 'mov_demo':
       plc.rungs = [
-        { elements: [
-          { id:'e1', type:'contact-no', address:'X0', preset:100 },
-          { id:'e2', type:'mov', address:'', preset:100, movSource:'K100', movDest:'D0' }
-        ]},
-        { elements: [
-          { id:'e3', type:'contact-no', address:'X1', preset:100 },
-          { id:'e4', type:'mov', address:'', preset:100, movSource:'K-500', movDest:'D1' }
-        ]},
-        { elements: [
-          { id:'e5', type:'contact-no', address:'X2', preset:100 },
-          { id:'e6', type:'mov', address:'', preset:100, movSource:'D0', movDest:'DD0' }
-        ]},
-        { elements: [
-          { id:'e7', type:'contact-no', address:'X3', preset:100 },
-          { id:'e8', type:'mov', address:'', preset:100, movSource:'K12345', movDest:'DD1' }
-        ]},
-        { elements: [
-          { id:'e9', type:'contact-no', address:'D0', preset:100 },
-          { id:'e10', type:'coil', address:'Y0', preset:100 }
-        ]}
+        createRungWithElements([
+          [{type:'contact-no', address:'X0'}, {type:'mov', address:'', movSource:'K100', movDest:'D0'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'X1'}, {type:'mov', address:'', movSource:'K-500', movDest:'D1'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'X2'}, {type:'mov', address:'', movSource:'D0', movDest:'DD0'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'X3'}, {type:'mov', address:'', movSource:'K12345', movDest:'DD1'}]
+        ]),
+        createRungWithElements([
+          [{type:'contact-no', address:'D0'}, {type:'coil', address:'Y0'}]
+        ])
       ];
       break;
   }
@@ -1458,11 +1597,36 @@ function loadExample(name) {
   showToast('已加载: ' + name);
 }
 
+function createRungWithElements(rowData) {
+  const rung = createEmptyRung();
+  rung.rows = rowData.length;
+  rung.grid = [];
+  
+  for (let r = 0; r < rowData.length; r++) {
+    const row = new Array(GRID.maxCols).fill(null);
+    for (let c = 0; c < rowData[r].length && c < GRID.maxCols; c++) {
+      if (rowData[r][c]) {
+        row[c] = {
+          id: 'el_' + Date.now() + '_' + r + '_' + c + '_' + Math.random().toString(36).substr(2,4),
+          type: rowData[r][c].type,
+          address: rowData[r][c].address || '',
+          preset: rowData[r][c].preset || 100,
+          movSource: rowData[r][c].movSource || '',
+          movDest: rowData[r][c].movDest || ''
+        };
+      }
+    }
+    rung.grid.push(row);
+  }
+  
+  return rung;
+}
+
 // ==================== Import/Export ====================
 function showExportModal() {
   const data = {
     rungs: plc.rungs,
-    version: '2.0',
+    version: '3.0',
     name: 'PLC程序',
     created: new Date().toISOString()
   };
@@ -1504,7 +1668,7 @@ function showImportModal() {
 
 function saveToLocal() {
   try {
-    localStorage.setItem('plc_sim_v2', JSON.stringify({ rungs: plc.rungs }));
+    localStorage.setItem('plc_sim_v3', JSON.stringify({ rungs: plc.rungs }));
     showToast('保存成功', 'success');
   } catch(e) {
     showToast('保存失败', 'error');
@@ -1518,14 +1682,12 @@ function init() {
   updateDataDisplay();
   window.addEventListener('resize', resizeCanvas);
 
-  // WeChat detection
   if (navigator.userAgent.toLowerCase().includes('micromessenger')) {
     console.log('WeChat detected');
   }
 
-  // Auto load
   try {
-    const saved = localStorage.getItem('plc_sim_v2');
+    const saved = localStorage.getItem('plc_sim_v3');
     if (saved) {
       const data = JSON.parse(saved);
       if (data.rungs && data.rungs.length > 0) {
