@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PLC编程演示 - 快速入门</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #00d4ff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .card {
+            background: rgba(45, 53, 97, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+        }
+        .card h2 {
+            color: #00d4ff;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .demo-item {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #555;
+        }
+        .demo-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #38ef7d;
+            margin-bottom: 10px;
+        }
+        .demo-desc {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        .ladder-demo {
+            background: #1e1e2e;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .power-rail {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .contact {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .coil {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .tip {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .variable-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .var-item {
+            background: rgba(30, 30, 50, 0.6);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #444;
+        }
+        .var-name {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .var-value {
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .var-value.on {
+            background: #38ef7d;
+            color: #000;
+        }
+        .var-value.off {
+            background: #f5576c;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 手机端 PLC 编程框架 - 演示</h1>
+        
+        <div class="tip">
+            <strong>💡 提示：</strong>点击下方按钮进入编程界面，或直接查看下面的示例程序学习如何使用。
+        </div>
+        
+        <a href="index.html" class="btn">进入编程界面 →</a>
+        
+        <div style="margin-top: 30px;">
+            <h2 style="color: #00d4ff; margin-bottom: 20px;">📚 示例程序</h2>
+            
+            <!-- 示例 1 -->
+            <div class="card">
+                <h2>示例 1: 启动 - 保持 - 停止电路</h2>
+                <div class="demo-item">
+                    <div class="demo-title">功能说明</div>
+                    <div class="demo-desc">
+                        经典的电机控制电路：按下启动按钮 (I0.0) 后电机 (Q0.0) 运行，
+                        松开按钮后继续运行（自锁），按下停止按钮 (I0.1) 后电机停止。
+                    </div>
+                    <div class="ladder-demo">
+                        <span class="power-rail">|</span>
+                        <span class="contact">I0.0</span> ──┬── <span class="contact">I0.1</span> ── <span class="coil">Q0.0</span> ── <span class="power-rail">|</span><br>
+                        <span class="power-rail">|</span>
+                        <span class="contact">Q0.0</span> ──┘
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 示例 2 -->
+            <div class="card">
+                <h2>示例 2: 定时器控制</h2>
+                <div class="demo-item">
+                    <div class="demo-title">功能说明</div>
+                    <div class="demo-desc">
+                        按下按钮 (I0.0) 后，延时 5 秒，输出 (Q0.1) 接通。
+                        使用接通延时定时器 (TON)。
+                    </div>
+                    <div class="ladder-demo">
+                        <span class="power-rail">|</span>
+                        <span class="contact">I0.0</span> ── <span class="coil">T0 (TON)</span> ── <span class="power-rail">|</span><br>
+                        <span style="color: #666;">预设值：5000ms</span><br><br>
+                        <span class="power-rail">|</span>
+                        <span class="contact">T0</span> ── <span class="coil">Q0.1</span> ── <span class="power-rail">|</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 示例 3 -->
+            <div class="card">
+                <h2>示例 3: 计数器应用</h2>
+                <div class="demo-item">
+                    <div class="demo-title">功能说明</div>
+                    <div class="demo-desc">
+                        每按一次按钮 (I0.2)，计数器加 1。
+                        计数到 5 次后，输出 (Q0.2) 接通。
+                    </div>
+                    <div class="ladder-demo">
+                        <span class="power-rail">|</span>
+                        <span class="contact">I0.2</span> ── <span class="coil">C0 (CTU)</span> ── <span class="power-rail">|</span><br>
+                        <span style="color: #666;">预设值：5</span><br><br>
+                        <span class="power-rail">|</span>
+                        <span class="contact">C0</span> ── <span class="coil">Q0.2</span> ── <span class="power-rail">|</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 变量监视 -->
+            <div class="card">
+                <h2>📊 变量状态演示</h2>
+                <div class="variable-box">
+                    <div class="var-item">
+                        <div class="var-name">I0.0</div>
+                        <div class="var-value off" onclick="toggleVar(this)">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">I0.1</div>
+                        <div class="var-value off" onclick="toggleVar(this)">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">I0.2</div>
+                        <div class="var-value off" onclick="toggleVar(this)">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">Q0.0</div>
+                        <div class="var-value off">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">Q0.1</div>
+                        <div class="var-value off">0</div>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-name">Q0.2</div>
+                        <div class="var-value off">0</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; color: #aaa; font-size: 13px;">
+                    💡 点击输入变量 (I0.0-I0.2) 可以切换状态
+                </div>
+            </div>
+        </div>
+        
+        <a href="index.html" class="btn" style="margin-top: 30px;">开始编程 →</a>
+    </div>
+    
+    <script>
+        function toggleVar(element) {
+            if (element.classList.contains('on')) {
+                element.classList.remove('on');
+                element.classList.add('off');
+                element.textContent = '0';
+            } else {
+                element.classList.remove('off');
+                element.classList.add('on');
+                element.textContent = '1';
+            }
+        }
+    </script>
+</body>
+</html>
