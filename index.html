@@ -333,7 +333,7 @@ input,select,textarea{font-family:inherit;outline:none}
     <div class="header-left">
       <div class="header-logo">⚡</div>
       <span class="header-title">PLC 仿真器</span>
-      <span class="header-badge">v4.2</span>
+      <span class="header-badge">v4.3</span>
     </div>
     <div class="header-right">
       <div class="run-indicator" id="runStatus">
@@ -350,7 +350,10 @@ input,select,textarea{font-family:inherit;outline:none}
       <span class="tab-icon">📐</span><span>梯形图</span>
     </button>
     <button class="nav-tab" onclick="switchTab('io',this)">
-      <span class="tab-icon">📊</span><span>监控</span>
+      <span class="tab-icon">📊</span><span>IO监控</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('vars',this)">
+      <span class="tab-icon">📋</span><span>变量监控</span>
     </button>
     <button class="nav-tab" onclick="switchTab('project',this)">
       <span class="tab-icon">📁</span><span>工程</span>
@@ -392,16 +395,11 @@ input,select,textarea{font-family:inherit;outline:none}
       </div>
     </div>
 
-    <!-- Tab 2: 监控中心 -->
+    <!-- Tab 2: IO监控 -->
     <div class="tab-page io-page" id="tab-io">
-      <div class="io-tabs" style="flex-wrap:wrap">
-        <button class="io-tab active" onclick="switchIOTab('io_inputs',this)">📥 X</button>
-        <button class="io-tab" onclick="switchIOTab('io_outputs',this)">📤 Y</button>
-        <button class="io-tab" onclick="switchIOTab('io_relays',this)">🔵 M</button>
-        <button class="io-tab" onclick="switchIOTab('io_timers',this)">⏱ T</button>
-        <button class="io-tab" onclick="switchIOTab('io_counters',this)">🔢 C</button>
-        <button class="io-tab" onclick="switchIOTab('io_dataregs',this)">📊 D/DD</button>
-        <button class="io-tab" onclick="switchIOTab('io_vartable',this)">📋 变量表</button>
+      <div class="io-tabs">
+        <button class="io-tab active" onclick="switchIOTab('io_inputs',this)">📥 输入X</button>
+        <button class="io-tab" onclick="switchIOTab('io_outputs',this)">📤 输出Y</button>
       </div>
       <div class="io-content" id="ioContent">
         <div id="io_inputs">
@@ -422,7 +420,20 @@ input,select,textarea{font-family:inherit;outline:none}
             <div class="io-grid" id="outputGrid"></div>
           </div>
         </div>
-        <div id="io_relays" style="display:none">
+      </div>
+    </div>
+
+    <!-- Tab 3: 变量监控 -->
+    <div class="tab-page io-page" id="tab-vars">
+      <div class="io-tabs" style="flex-wrap:wrap">
+        <button class="io-tab active" onclick="switchVarTab('var_relays',this)">🔵 M</button>
+        <button class="io-tab" onclick="switchVarTab('var_timers',this)">⏱ T</button>
+        <button class="io-tab" onclick="switchVarTab('var_counters',this)">🔢 C</button>
+        <button class="io-tab" onclick="switchVarTab('var_dataregs',this)">📊 D/DD</button>
+        <button class="io-tab" onclick="switchVarTab('var_table',this)">📋 变量表</button>
+      </div>
+      <div class="io-content" id="varContent">
+        <div id="var_relays">
           <div class="io-section">
             <div class="io-section-header">
               <span class="io-section-title"><span class="icon m">🔵</span> 中间继电器 (仅已使用)</span>
@@ -431,7 +442,7 @@ input,select,textarea{font-family:inherit;outline:none}
             <div id="relayList"></div>
           </div>
         </div>
-        <div id="io_timers" style="display:none">
+        <div id="var_timers" style="display:none">
           <div class="io-section">
             <div class="io-section-header">
               <span class="io-section-title"><span class="icon t">⏱</span> 定时器 T0~T15</span>
@@ -439,7 +450,7 @@ input,select,textarea{font-family:inherit;outline:none}
             <div id="timerList"></div>
           </div>
         </div>
-        <div id="io_counters" style="display:none">
+        <div id="var_counters" style="display:none">
           <div class="io-section">
             <div class="io-section-header">
               <span class="io-section-title"><span class="icon c">🔢</span> 计数器 C0~C15</span>
@@ -447,7 +458,7 @@ input,select,textarea{font-family:inherit;outline:none}
             <div id="counterList"></div>
           </div>
         </div>
-        <div id="io_dataregs" style="display:none">
+        <div id="var_dataregs" style="display:none">
           <div class="io-section">
             <div class="io-section-header">
               <span class="io-section-title"><span class="icon d">📊</span> 数据寄存器 (仅已使用)</span>
@@ -456,7 +467,7 @@ input,select,textarea{font-family:inherit;outline:none}
             <div id="dataregList"></div>
           </div>
         </div>
-        <div id="io_vartable" style="display:none">
+        <div id="var_table" style="display:none">
           <div class="var-table-header">
             <span class="var-table-title">变量定义表</span>
             <span class="var-table-count" id="varTotalCount">0 变量</span>
@@ -810,23 +821,32 @@ function switchTab(name, btn) {
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'program') setTimeout(resizeCanvas, 50);
-  if (name === 'io') { updateIODisplay(); renderRelayList(); renderDataregList(); renderVarTable(); }
+  if (name === 'io') updateIODisplay();
+  if (name === 'vars') { renderRelayList(); renderDataregList(); renderVarTable(); }
 }
 
 function switchIOTab(id, btn) {
-  document.querySelectorAll('.io-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tab-io .io-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  ['io_inputs','io_outputs','io_relays','io_timers','io_counters','io_dataregs','io_vartable'].forEach(tid => {
+  ['io_inputs','io_outputs'].forEach(tid => {
     document.getElementById(tid).style.display = tid === id ? 'block' : 'none';
   });
-  // 变量表子页面不需要外层padding
-  const ioContent = document.getElementById('ioContent');
-  ioContent.style.padding = id === 'io_vartable' ? '0' : '12px';
-  ioContent.style.overflowY = id === 'io_vartable' ? 'hidden' : 'auto';
   updateIODisplay();
-  if (id === 'io_relays') renderRelayList();
-  if (id === 'io_dataregs') renderDataregList();
-  if (id === 'io_vartable') renderVarTable();
+}
+
+function switchVarTab(id, btn) {
+  document.querySelectorAll('#tab-vars .io-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['var_relays','var_timers','var_counters','var_dataregs','var_table'].forEach(tid => {
+    document.getElementById(tid).style.display = tid === id ? 'block' : 'none';
+  });
+  const varContent = document.getElementById('varContent');
+  varContent.style.padding = id === 'var_table' ? '0' : '12px';
+  varContent.style.overflowY = id === 'var_table' ? 'hidden' : 'auto';
+  if (id === 'var_relays') renderRelayList();
+  if (id === 'var_dataregs') renderDataregList();
+  if (id === 'var_table') renderVarTable();
+  updateIODisplay();
 }
 
 function toggleCollapse(header) {
@@ -1232,7 +1252,7 @@ function drawLadder() {
     ctx.textAlign = 'center';
     ctx.fillText('点击 "+ 梯级" 或选择示例开始编程', W/2, H/2 - 10);
     ctx.font = '400 12px ' + getComputedStyle(document.body).fontFamily;
-    ctx.fillText('v4.2: M/D智能监控 · 变量表 · 并联仿真 · 边沿检测', W/2, H/2 + 14);
+    ctx.fillText('v4.3: IO监控+变量监控分离 · 并联仿真 · 边沿检测', W/2, H/2 + 14);
     return;
   }
 
@@ -2313,7 +2333,7 @@ function createRungFromData(rowData) {
 
 // ==================== Import/Export ====================
 function showExportModal() {
-  const data = { rungs: plc.rungs, version: '4.2', varComments: plc.varComments, name: 'PLC程序', created: new Date().toISOString() };
+  const data = { rungs: plc.rungs, version: '4.3', varComments: plc.varComments, name: 'PLC程序', created: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2348,7 +2368,7 @@ function showImportModal() {
 
 function saveToLocal() {
   try {
-    localStorage.setItem('plc_sim_v42', JSON.stringify({ rungs: plc.rungs, varComments: plc.varComments }));
+    localStorage.setItem('plc_sim_v43', JSON.stringify({ rungs: plc.rungs, varComments: plc.varComments }));
     showToast('保存成功', 'success');
   } catch(e) { showToast('保存失败', 'error'); }
 }
@@ -2361,7 +2381,7 @@ function init() {
   window.addEventListener('resize', resizeCanvas);
 
   try {
-    const saved = localStorage.getItem('plc_sim_v42');
+    const saved = localStorage.getItem('plc_sim_v43');
     if (saved) {
       const data = JSON.parse(saved);
       if (data.rungs && data.rungs.length > 0) {
