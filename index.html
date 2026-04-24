@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>PLC 仿真器 Pro v4.1</title>
+<title>PLC 仿真器 Pro v4.2</title>
 <style>
 :root {
   --primary:#2563eb;--primary-light:#3b82f6;--primary-dark:#1d4ed8;--primary-bg:#eff6ff;
@@ -82,7 +82,10 @@ input,select,textarea{font-family:inherit;outline:none}
 .io-tab.active{color:var(--primary)}
 .io-tab::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:2px;background:var(--primary);border-radius:2px;transition:all 0.25s;transform:translateX(-50%)}
 .io-tab.active::after{width:50%}
-.io-content{flex:1;overflow-y:auto;padding:12px}
+.io-content{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column}
+.io-content>div:not([style*="display:none"]){flex:1;min-height:0}
+#io_vartable.active-subtab,#io_vartable[style*="block"]{padding:0!important}
+.io-content>div[id="io_inputs"],.io-content>div[id="io_outputs"],.io-content>div[id="io_relays"],.io-content>div[id="io_timers"],.io-content>div[id="io_counters"],.io-content>div[id="io_dataregs"]{overflow-y:auto}
 
 .io-section{margin-bottom:14px;background:var(--surface);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light)}
 .io-section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -187,6 +190,25 @@ input,select,textarea{font-family:inherit;outline:none}
 .var-toolbar-btn.primary-btn{background:var(--primary);color:#fff;border-color:var(--primary)}
 .var-toolbar-btn.primary-btn:active{background:var(--primary-dark)}
 .var-toolbar-info{margin-left:auto;font-size:10px;color:var(--text-muted)}
+
+/* Device cards for Timer/Counter */
+.device-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-md);margin-bottom:6px;border:1px solid var(--border-light);transition:all 0.2s;box-shadow:var(--shadow-sm)}
+.device-card.active{border-color:var(--primary);background:var(--primary-bg)}
+.device-info{display:flex;align-items:center;gap:8px;flex:1}
+.device-icon{width:28px;height:28px;border-radius:6px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-secondary)}
+.device-card.active .device-icon{background:var(--primary-bg);color:var(--primary);border-color:var(--primary)}
+.device-name{font-size:13px;font-weight:700;color:var(--text)}
+.device-values{display:flex;align-items:center;gap:3px}
+.device-cv{font-size:14px;font-weight:700;font-family:var(--font-mono);color:var(--text)}
+.device-pv{font-size:12px;color:var(--text-muted);font-family:var(--font-mono)}
+.device-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--text-muted);font-weight:600;border:1px solid var(--border-light);white-space:nowrap}
+.device-card.active .device-badge{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* io_vartable内嵌布局 */
+#io_vartable{display:flex;flex-direction:column;height:100%;overflow:hidden}
+#io_vartable .var-table-header{flex-shrink:0}
+#io_vartable .var-table-body{flex:1;overflow-y:auto;min-height:0}
+#io_vartable .var-table-toolbar{flex-shrink:0}
 
 /* Empty state */
 .var-empty{padding:40px 20px;text-align:center}
@@ -311,7 +333,7 @@ input,select,textarea{font-family:inherit;outline:none}
     <div class="header-left">
       <div class="header-logo">⚡</div>
       <span class="header-title">PLC 仿真器</span>
-      <span class="header-badge">v4.1</span>
+      <span class="header-badge">v4.2</span>
     </div>
     <div class="header-right">
       <div class="run-indicator" id="runStatus">
@@ -328,10 +350,7 @@ input,select,textarea{font-family:inherit;outline:none}
       <span class="tab-icon">📐</span><span>梯形图</span>
     </button>
     <button class="nav-tab" onclick="switchTab('io',this)">
-      <span class="tab-icon">📊</span><span>IO监控</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('vars',this)">
-      <span class="tab-icon">📋</span><span>变量表</span>
+      <span class="tab-icon">📊</span><span>监控</span>
     </button>
     <button class="nav-tab" onclick="switchTab('project',this)">
       <span class="tab-icon">📁</span><span>工程</span>
@@ -373,13 +392,16 @@ input,select,textarea{font-family:inherit;outline:none}
       </div>
     </div>
 
-    <!-- Tab 2: IO监控 -->
+    <!-- Tab 2: 监控中心 -->
     <div class="tab-page io-page" id="tab-io">
-      <div class="io-tabs">
-        <button class="io-tab active" onclick="switchIOTab('io_inputs',this)">📥 输入X</button>
-        <button class="io-tab" onclick="switchIOTab('io_outputs',this)">📤 输出Y</button>
-        <button class="io-tab" onclick="switchIOTab('io_timers',this)">⏱ 定时器T</button>
-        <button class="io-tab" onclick="switchIOTab('io_counters',this)">🔢 计数器C</button>
+      <div class="io-tabs" style="flex-wrap:wrap">
+        <button class="io-tab active" onclick="switchIOTab('io_inputs',this)">📥 X</button>
+        <button class="io-tab" onclick="switchIOTab('io_outputs',this)">📤 Y</button>
+        <button class="io-tab" onclick="switchIOTab('io_relays',this)">🔵 M</button>
+        <button class="io-tab" onclick="switchIOTab('io_timers',this)">⏱ T</button>
+        <button class="io-tab" onclick="switchIOTab('io_counters',this)">🔢 C</button>
+        <button class="io-tab" onclick="switchIOTab('io_dataregs',this)">📊 D/DD</button>
+        <button class="io-tab" onclick="switchIOTab('io_vartable',this)">📋 变量表</button>
       </div>
       <div class="io-content" id="ioContent">
         <div id="io_inputs">
@@ -400,6 +422,15 @@ input,select,textarea{font-family:inherit;outline:none}
             <div class="io-grid" id="outputGrid"></div>
           </div>
         </div>
+        <div id="io_relays" style="display:none">
+          <div class="io-section">
+            <div class="io-section-header">
+              <span class="io-section-title"><span class="icon m">🔵</span> 中间继电器 (仅已使用)</span>
+              <span class="io-section-sub" id="relayCount">0 个</span>
+            </div>
+            <div id="relayList"></div>
+          </div>
+        </div>
         <div id="io_timers" style="display:none">
           <div class="io-section">
             <div class="io-section-header">
@@ -416,26 +447,30 @@ input,select,textarea{font-family:inherit;outline:none}
             <div id="counterList"></div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Tab 3: 变量定义表 (v4.1 NEW - replaces old 数据区) -->
-    <div class="tab-page var-table-page" id="tab-vars">
-      <div class="var-table-header">
-        <span class="var-table-title">变量定义表</span>
-        <span class="var-table-count" id="varTotalCount">0 变量</span>
-        <div class="var-table-search">
-          <input type="text" placeholder="搜索地址/注释..." id="varSearchInput" oninput="filterVarTable()">
+        <div id="io_dataregs" style="display:none">
+          <div class="io-section">
+            <div class="io-section-header">
+              <span class="io-section-title"><span class="icon d">📊</span> 数据寄存器 (仅已使用)</span>
+              <span class="io-section-sub" id="dataregCount">0 个</span>
+            </div>
+            <div id="dataregList"></div>
+          </div>
         </div>
-      </div>
-      <div class="var-table-body" id="varTableBody">
-        <!-- Dynamically generated -->
-      </div>
-      <div class="var-table-toolbar">
-        <button class="var-toolbar-btn primary-btn" onclick="addManualVar()">＋ 新增变量</button>
-        <button class="var-toolbar-btn" onclick="autoScanVars()">🔍 扫描程序</button>
-        <button class="var-toolbar-btn" onclick="expandAllVarGroups()">📂 全部展开</button>
-        <span class="var-toolbar-info" id="varFilterInfo"></span>
+        <div id="io_vartable" style="display:none">
+          <div class="var-table-header">
+            <span class="var-table-title">变量定义表</span>
+            <span class="var-table-count" id="varTotalCount">0 变量</span>
+            <div class="var-table-search">
+              <input type="text" placeholder="搜索地址/注释..." id="varSearchInput" oninput="filterVarTable()">
+            </div>
+          </div>
+          <div class="var-table-body" id="varTableBody"></div>
+          <div class="var-table-toolbar">
+            <button class="var-toolbar-btn primary-btn" onclick="addManualVar()">＋ 新增</button>
+            <button class="var-toolbar-btn" onclick="autoScanVars()">🔍 扫描</button>
+            <span class="var-toolbar-info" id="varFilterInfo"></span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -775,17 +810,23 @@ function switchTab(name, btn) {
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'program') setTimeout(resizeCanvas, 50);
-  if (name === 'io') updateIODisplay();
-  if (name === 'vars') renderVarTable();
+  if (name === 'io') { updateIODisplay(); renderRelayList(); renderDataregList(); renderVarTable(); }
 }
 
 function switchIOTab(id, btn) {
   document.querySelectorAll('.io-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  ['io_inputs','io_outputs','io_timers','io_counters'].forEach(tid => {
+  ['io_inputs','io_outputs','io_relays','io_timers','io_counters','io_dataregs','io_vartable'].forEach(tid => {
     document.getElementById(tid).style.display = tid === id ? 'block' : 'none';
   });
+  // 变量表子页面不需要外层padding
+  const ioContent = document.getElementById('ioContent');
+  ioContent.style.padding = id === 'io_vartable' ? '0' : '12px';
+  ioContent.style.overflowY = id === 'io_vartable' ? 'hidden' : 'auto';
   updateIODisplay();
+  if (id === 'io_relays') renderRelayList();
+  if (id === 'io_dataregs') renderDataregList();
+  if (id === 'io_vartable') renderVarTable();
 }
 
 function toggleCollapse(header) {
@@ -1191,7 +1232,7 @@ function drawLadder() {
     ctx.textAlign = 'center';
     ctx.fillText('点击 "+ 梯级" 或选择示例开始编程', W/2, H/2 - 10);
     ctx.font = '400 12px ' + getComputedStyle(document.body).fontFamily;
-    ctx.fillText('v4.1: 变量定义表 · 并联仿真 · 边沿检测 · TONR/TOF', W/2, H/2 + 14);
+    ctx.fillText('v4.2: M/D智能监控 · 变量表 · 并联仿真 · 边沿检测', W/2, H/2 + 14);
     return;
   }
 
@@ -1978,6 +2019,110 @@ function setSpeed(spd, btn) {
   if (plc.isRunning) startScanLoop();
 }
 
+// ==================== M Relay & D DataReg Lists (v4.2) ====================
+function getUsedBitAddrs(typePrefix) {
+  const addrs = new Set();
+  plc.rungs.forEach(rung => {
+    for (let row = 0; row < rung.rows; row++) {
+      const rowData = rung.grid[row];
+      if (!rowData) continue;
+      for (let col = 0; col < GRID.maxCols; col++) {
+        const el = rowData[col];
+        if (!el) continue;
+        if (el.address) {
+          const p = parseAddr(el.address);
+          if (p && p.type === typePrefix) addrs.add(p.idx);
+        }
+      }
+    }
+  });
+  return [...addrs].sort((a,b) => a - b);
+}
+
+function getDataAddrs() {
+  const addrs = new Map(); // key -> 'D' or 'DD'
+  plc.rungs.forEach(rung => {
+    for (let row = 0; row < rung.rows; row++) {
+      const rowData = rung.grid[row];
+      if (!rowData) continue;
+      for (let col = 0; col < GRID.maxCols; col++) {
+        const el = rowData[col];
+        if (!el) continue;
+        [el.movSource, el.movDest, el.arithSrc1, el.arithSrc2, el.arithDst].forEach(token => {
+          if (!token) return;
+          const t = token.toUpperCase().trim();
+          if (t.startsWith('DD')) {
+            const idx = parseInt(t.substring(2));
+            if (!isNaN(idx) && idx >= 0 && idx < 128 && !addrs.has('DD'+idx)) addrs.set('DD'+idx, 'DD');
+          } else if (t.startsWith('D')) {
+            const idx = parseInt(t.substring(1));
+            if (!isNaN(idx) && idx >= 0 && idx < 256 && !addrs.has('D'+idx)) addrs.set('D'+idx, 'D');
+          }
+        });
+      }
+    }
+  });
+  return addrs;
+}
+
+function renderRelayList() {
+  const usedM = getUsedBitAddrs('M');
+  const list = document.getElementById('relayList');
+  const count = document.getElementById('relayCount');
+  count.textContent = usedM.length + ' 个';
+
+  if (usedM.length === 0) {
+    list.innerHTML = '<div class="var-empty"><div class="var-empty-icon">🔵</div><div class="var-empty-text">暂无已使用的M继电器</div><div class="var-empty-sub">在梯形图中使用M地址后自动出现</div></div>';
+    return;
+  }
+
+  let html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  usedM.forEach(idx => {
+    const addr = 'M' + idx;
+    const on = plc.relays[idx];
+    const comment = plc.varComments[addr] || '';
+    html += '<div class="io-input-btn' + (on ? ' on' : '') + '" style="border-color:' + (on ? '#8b5cf6' : 'var(--border)') + ';background:' + (on ? '#f3e8ff' : 'var(--bg)') + '" onclick="plc.relays[' + idx + ']=!plc.relays[' + idx + '];renderRelayList();if(!plc.isRunning)drawLadder()">';
+    html += '<span class="io-label" style="color:' + (on ? '#8b5cf6' : 'var(--text-secondary)') + '">' + addr + '</span>';
+    html += '<span class="io-status" style="color:' + (on ? '#8b5cf6' : 'var(--text-muted)') + '">' + (on ? 'ON' : 'OFF') + '</span>';
+    if (comment) html += '<span style="font-size:9px;color:var(--text-muted);margin-top:2px">' + comment + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  list.innerHTML = html;
+}
+
+function renderDataregList() {
+  const usedData = getDataAddrs();
+  const list = document.getElementById('dataregList');
+  const count = document.getElementById('dataregCount');
+  count.textContent = usedData.size + ' 个';
+
+  if (usedData.size === 0) {
+    list.innerHTML = '<div class="var-empty"><div class="var-empty-icon">📊</div><div class="var-empty-text">暂无已使用的数据寄存器</div><div class="var-empty-sub">使用MOV/ADD/SUB指令操作D或DD后自动出现</div></div>';
+    return;
+  }
+
+  let html = '';
+  usedData.forEach((dtype, key) => {
+    const isDD = dtype === 'DD';
+    const idx = parseInt(key.substring(isDD ? 2 : 1));
+    const val = isDD ? plc.dataDint[idx] : plc.dataInt[idx];
+    const comment = plc.varComments[key] || '';
+    const valColor = val < 0 ? 'var(--danger)' : 'var(--text)';
+    const bgColor = isDD ? '#fef3c7' : 'var(--primary-bg)';
+    const addrColor = isDD ? '#d97706' : 'var(--primary)';
+
+    html += '<div class="var-row">';
+    html += '<span class="var-addr" style="color:' + addrColor + ';font-family:var(--font-mono);font-weight:700;min-width:50px">' + key + '</span>';
+    html += '<span class="var-value" style="color:' + valColor + ';font-family:var(--font-mono);font-weight:700;min-width:70px;text-align:right">' + val + '</span>';
+    html += '<span class="var-preset-info" style="background:' + bgColor + ';padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;color:' + addrColor + '">' + (isDD ? 'DINT' : 'INT') + '</span>';
+    html += '<span class="var-comment' + (comment ? '' : ' empty') + '" onclick="openCommentPopup(\'' + key + '\')">' + (comment || '点击添加注释') + '</span>';
+    html += '<button class="var-comment-btn" onclick="openCommentPopup(\'' + key + '\')">✏️</button>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
 // ==================== IO Display ====================
 function updateIODisplay() {
   // Inputs X0~X15
@@ -2168,7 +2313,7 @@ function createRungFromData(rowData) {
 
 // ==================== Import/Export ====================
 function showExportModal() {
-  const data = { rungs: plc.rungs, version: '4.1', varComments: plc.varComments, name: 'PLC程序', created: new Date().toISOString() };
+  const data = { rungs: plc.rungs, version: '4.2', varComments: plc.varComments, name: 'PLC程序', created: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2203,7 +2348,7 @@ function showImportModal() {
 
 function saveToLocal() {
   try {
-    localStorage.setItem('plc_sim_v41', JSON.stringify({ rungs: plc.rungs, varComments: plc.varComments }));
+    localStorage.setItem('plc_sim_v42', JSON.stringify({ rungs: plc.rungs, varComments: plc.varComments }));
     showToast('保存成功', 'success');
   } catch(e) { showToast('保存失败', 'error'); }
 }
@@ -2216,7 +2361,7 @@ function init() {
   window.addEventListener('resize', resizeCanvas);
 
   try {
-    const saved = localStorage.getItem('plc_sim_v41');
+    const saved = localStorage.getItem('plc_sim_v42');
     if (saved) {
       const data = JSON.parse(saved);
       if (data.rungs && data.rungs.length > 0) {
